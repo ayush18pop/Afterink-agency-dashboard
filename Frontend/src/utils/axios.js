@@ -2,8 +2,8 @@ import axios from "axios";
 
 const baseURL =
   process.env.NODE_ENV === "development"
-    ? "https://afterink-agency-dashboard.vercel.app"
-    : "https://afterink-agency-dashboard.vercel.app";
+    ? "http://localhost:5000"
+    : "https://afterink-agency-dashboard-backend.onrender.com";
 
 const instance = axios.create({
   baseURL,

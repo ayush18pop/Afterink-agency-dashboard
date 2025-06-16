@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../utils/axios";
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -18,7 +18,7 @@ const FreelancerAnalysis = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/dashboard/overview", { withCredentials: true })
+      .get("/api/dashboard/overview", { withCredentials: true })
       .then((res) => {
         const tasks = res.data.data;
         const stats = {};
