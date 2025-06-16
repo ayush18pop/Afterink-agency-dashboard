@@ -1,8 +1,8 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png"; // Adjust path if needed
-import { FaTachometerAlt, FaUserPlus, FaTasks } from "react-icons/fa"; // Importing icons for better visuals
+import { FaTachometerAlt, FaUserPlus, FaTasks, FaUser } from "react-icons/fa"; // Importing icons for better visuals
 import "../../sidebar-logo-fix.css";
 
 const links = [
@@ -12,6 +12,11 @@ const links = [
 
 export default function FoundingSidebar() {
   const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   return (
     <aside className="h-screen w-64 bg-gray-950 border-r border-gray-800 text-white flex flex-col transition-all duration-300">
@@ -45,12 +50,16 @@ export default function FoundingSidebar() {
             <span>{link.label}</span>
           </NavLink>
         ))}
-      </nav>
-
-      {/* Logout Section */}
+      </nav>      {/* Logout Section */}
       <div className="px-6 py-6 mt-auto border-t border-gray-800">
         <div className="flex items-center justify-between gap-2 text-sm">
-          <span className="text-gray-400">{user?.name}</span>
+          <button
+            onClick={handleProfileClick}
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <FaUser size={14} />
+            <span>{user?.name}</span>
+          </button>
           <button
             onClick={logout}
             className="text-red-500 font-semibold hover:underline"

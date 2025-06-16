@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 
 // CEO pages
 import Dashboard from "./pages/CEO/Dashboard";
@@ -45,26 +46,27 @@ export default function App() {
           {/* Public Route */}
           <Route path="/login" element={<LoginPage />} />
 
-          {/* CEO Routes */}
-         import CEOLayout from "./pages/CEO/Layout";
+          {/* Protected Profile Route - Accessible to all authenticated users */}
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
 
-<Route path="/ceo" element={<CEOOnlyRoute><CEOLayout /></CEOOnlyRoute>}>
-  <Route path="dashboard" element={<Dashboard />} />
-  <Route path="add-task" element={<AddTaskPage />} />
-  <Route path="add-user" element={<AddUserPage />} />
-  <Route path="leaderboard" element={<Leaderboard />} />
-  <Route path="top" element={<TopPerfomancePage />} />
-  <Route path="tasks" element={<CEOTasks />} />
-    <Route path="profile" element={<CEOProfile />} />
-  <Route index element={<Navigate to="dashboard" replace />} />
-</Route>
+          {/* CEO Routes */}
+          <Route path="/ceo" element={<CEOOnlyRoute><CEOLayout /></CEOOnlyRoute>}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="add-task" element={<AddTaskPage />} />
+            <Route path="add-user" element={<AddUserPage />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="top" element={<TopPerfomancePage />} />
+            <Route path="tasks" element={<CEOTasks />} />
+            <Route path="profile" element={<CEOProfile />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
 
           {/* Founding Member Routes */}
           <Route path="/founding" element={<FoundingOnlyRoute><FoundingLayout /></FoundingOnlyRoute>}>
             <Route path="tasks" element={<MyTasks />} />
             <Route path="analysis" element={<FreelancerAnalysis />} />
             <Route path="add-user" element={<AddFreelancerForm />} />
-             <Route path="profile" element={<FoundingProfile />} />
+            <Route path="profile" element={<FoundingProfile />} />
             <Route index element={<Navigate to="tasks" replace />} />
           </Route>
 

@@ -17,25 +17,22 @@ useEffect(() => {
     localStorage.removeItem("user"); // optional: clear bad value
   }
   setLoading(false);
-}, []);
-
-  
-
-
-
-  const login = (userInfo) => {
+}, []);  const login = (userInfo) => {
     setUser(userInfo);
     localStorage.setItem("user", JSON.stringify(userInfo));
   };
 
+  const updateUser = (updatedUserInfo) => {
+    setUser(updatedUserInfo);
+    localStorage.setItem("user", JSON.stringify(updatedUserInfo));
+  };
   
 const logout = async () => {
   await axios.post("/api/auth/logout");
   setUser(null);
   localStorage.removeItem("user");
-};
-  return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+};  return (
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

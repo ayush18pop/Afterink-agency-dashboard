@@ -1,8 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.png";
 import { useState } from "react";
-import { FaTachometerAlt, FaPlus, FaUserPlus, FaList, FaTasks, FaTrophy } from "react-icons/fa"; // Importing icons
+import { FaTachometerAlt, FaPlus, FaUserPlus, FaList, FaTasks, FaTrophy, FaUser } from "react-icons/fa"; // Importing icons
 
 const links = [
   { to: "/ceo/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
@@ -16,10 +16,15 @@ const links = [
 export default function Sidebar() {
   const { logout, user } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true); // State to control sidebar visibility
 
   // Toggle sidebar open/close
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   return (
     <div className={`h-screen ${isOpen ? "w-64" : "w-16"} bg-[#181824] border-r border-[#25253a] flex flex-col transition-all duration-300`}>
@@ -48,15 +53,31 @@ export default function Sidebar() {
             </div>
           </Link>
         ))}
-      </nav>
-      <div className="px-6 py-6 mt-auto">
+      </nav>      <div className="px-6 py-6 mt-auto">
         <div className={`flex items-center ${isOpen ? 'justify-between gap-2' : 'justify-center'}`}> 
-          {isOpen && <span className="text-gray-400 text-sm">{user?.name}</span>}
+          {isOpen && (
+            <button
+              onClick={handleProfileClick}
+              className="flex items-center gap-2 text-gray-400 text-sm hover:text-white transition-colors cursor-pointer"
+            >
+              <FaUser size={14} />
+              <span>{user?.name}</span>
+            </button>
+          )}
+          {!isOpen && (
+            <button
+              onClick={handleProfileClick}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Profile"
+            >
+              <FaUser size={16} />
+            </button>
+          )}
           <button
             className="text-[#fa5252] text-xs font-semibold hover:underline"
             onClick={logout}
           >
-            Logout
+            {isOpen ? 'Logout' : 'Out'}
           </button>
         </div>
       </div>
