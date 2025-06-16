@@ -25,12 +25,12 @@ export default function MyTasks() {
       // Check if any task is already in progress and set it to hold
       const inProgressTask = tasks.find(t => t.memberStatus === "In Progress");
       if (inProgressTask) {
-        await axios.post("http://localhost:5000/api/time/hold", { taskId: inProgressTask._id });  // Put the current task on hold
+        await axios.post("https://afterink-agency-dashboard.vercel.app/api/time/hold", { taskId: inProgressTask._id });  // Put the current task on hold
         setTasks(prev => prev.map(t => t._id === inProgressTask._id ? { ...t, memberStatus: "Hold" } : t));
       }
 
       // Now, start the new task
-      await axios.post("http://localhost:5000/api/time/start", { taskId });
+      await axios.post("https://afterink-agency-dashboard.vercel.app/api/time/start", { taskId });
       setTasks(prev => prev.map(t => t._id === taskId ? { ...t, memberStatus: "In Progress" } : t));
       setUptimeMap(prev => ({ ...prev, [taskId]: 0 }));
       setActiveTask(taskId); // Set the active task
@@ -44,7 +44,7 @@ export default function MyTasks() {
   const holdTask = async (taskId) => {
     setChangingId(taskId);
     try {
-      await axios.post("http://localhost:5000/api/time/hold", { taskId });
+      await axios.post("https://afterink-agency-dashboard.vercel.app/api/time/hold", { taskId });
       setTasks(prev => prev.map(t => t._id === taskId ? { ...t, memberStatus: "Hold" } : t));
       setActiveTask(null); // Reset active task when it's put on hold
     } catch (error) {
@@ -57,7 +57,7 @@ export default function MyTasks() {
   const completeTask = async (taskId) => {
     setChangingId(taskId);
     try {
-      await axios.post("http://localhost:5000/api/time/complete", { taskId });
+      await axios.post("https://afterink-agency-dashboard.vercel.app/api/time/complete", { taskId });
       setTasks(prev => prev.map(t => t._id === taskId ? { ...t, memberStatus: "Completed" } : t));
       setActiveTask(null); // Reset active task when task is completed
     } catch (error) {
