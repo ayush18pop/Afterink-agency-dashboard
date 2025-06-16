@@ -15,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your frontend URL
+    origin: "https://afterink.vercel.app/", // Replace with your frontend URL
     credentials: true, // Important for cookies!
   })
 );
