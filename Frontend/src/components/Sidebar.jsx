@@ -23,19 +23,13 @@ export default function Sidebar() {
 
   return (
     <div className={`h-screen ${isOpen ? "w-64" : "w-16"} bg-[#181824] border-r border-[#25253a] flex flex-col transition-all duration-300`}>
-      <div className="flex items-center justify-between gap-3 px-6 py-7">
+      <div className={`flex items-center px-6 py-7 ${isOpen ? 'justify-center gap-3' : 'justify-center'}`}>
         <img src={logo} alt="AfterInk" className="w-10 h-10 rounded-lg" />
         {isOpen && (
           <span className="text-xl text-white font-bold tracking-wide">
             AfterInk
           </span>
         )}
-        <button
-          onClick={toggleSidebar}
-          className="text-white text-xl ml-auto"
-        >
-          {isOpen ? "❮" : "❯"} {/* Toggle arrow for open/close */}
-        </button>
       </div>
       <nav className="flex-1 flex flex-col gap-1 px-2">
         {links.map((link) => (
@@ -56,7 +50,7 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="px-6 py-6 mt-auto">
-        <div className="flex items-center justify-between gap-2">
+        <div className={`flex items-center ${isOpen ? 'justify-between gap-2' : 'justify-center'}`}> 
           {isOpen && <span className="text-gray-400 text-sm">{user?.name}</span>}
           <button
             className="text-[#fa5252] text-xs font-semibold hover:underline"

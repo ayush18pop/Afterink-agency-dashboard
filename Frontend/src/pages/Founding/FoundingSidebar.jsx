@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png"; // Adjust path if needed
 import { FaTachometerAlt, FaUserPlus, FaTasks } from "react-icons/fa"; // Importing icons for better visuals
+import "../../sidebar-logo-fix.css";
 
 const links = [
   { to: "/founding/tasks", label: "My Tasks", icon: <FaTasks /> },
@@ -11,23 +12,19 @@ const links = [
 
 export default function FoundingSidebar() {
   const { logout, user } = useAuth();
-  const [isOpen, setIsOpen] = useState(true); // State for sidebar visibility
-
-  // Toggle sidebar open/close
-  const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
-    <aside className={`h-screen ${isOpen ? "w-64" : "w-16"} bg-gray-950 border-r border-gray-800 text-white flex flex-col transition-all duration-300`}>
+    <aside className="h-screen w-64 bg-gray-950 border-r border-gray-800 text-white flex flex-col transition-all duration-300">
       {/* Logo Section */}
-      <div className="flex items-center justify-between gap-3 px-6 py-8">
-        <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg" />
-        {isOpen && <span className="text-xl font-bold tracking-wide">AfterInk FM</span>}
-        <button
-          onClick={toggleSidebar}
-          className="text-white text-xl ml-auto"
-        >
-          {isOpen ? "❮" : "❯"} {/* Toggle arrow for open/close */}
-        </button>
+      <div className="flex flex-col items-center gap-4 px-6 py-10">
+        <div className="sidebar-logo-container mb-2">
+          <img 
+            src={logo} 
+            alt="Logo" 
+            className="sidebar-logo-img rounded-lg"
+          />
+        </div>
+        <span className="text-2xl font-bold tracking-wide text-center">AfterInk FM</span>
       </div>
 
       {/* Nav Links */}
@@ -45,7 +42,7 @@ export default function FoundingSidebar() {
             }
           >
             <span className="text-lg">{link.icon}</span>
-            {isOpen && <span>{link.label}</span>} {/* Show label if sidebar is open */}
+            <span>{link.label}</span>
           </NavLink>
         ))}
       </nav>
@@ -53,7 +50,7 @@ export default function FoundingSidebar() {
       {/* Logout Section */}
       <div className="px-6 py-6 mt-auto border-t border-gray-800">
         <div className="flex items-center justify-between gap-2 text-sm">
-          {isOpen && <span className="text-gray-400">{user?.name}</span>}
+          <span className="text-gray-400">{user?.name}</span>
           <button
             onClick={logout}
             className="text-red-500 font-semibold hover:underline"
