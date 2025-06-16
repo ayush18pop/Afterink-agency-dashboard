@@ -7,10 +7,6 @@ const userController = require("../controllers/userController");
 router.get("/profile", authMiddleware, userController.getUserProfile);
 
 // Update user profile
-router.put(
-  "/profile",
-  authMiddleware,
-  userController.updateUserProfile
-);
+router.put("/profile", authMiddleware, userController.updateUserProfile);
 
 module.exports = router;

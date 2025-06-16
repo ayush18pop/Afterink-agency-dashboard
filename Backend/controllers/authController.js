@@ -1,22 +1,24 @@
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
     // Password validation: 8+ chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
-        error: 'Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.'
+        error:
+          "Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.",
       });
     }
 
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ error: 'User already exists' });
+    if (userExists)
+      return res.status(400).json({ error: "User already exists" });
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed, role });
@@ -25,15 +27,16 @@ exports.register = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};exports.login = async (req, res) => {
+};
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!user) return res.status(400).json({ error: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!match) return res.status(400).json({ error: "Invalid credentials" });
 
     // 🔐 Generate a new session version (timestamp)
     const sessionVersion = new Date().toISOString();
@@ -45,24 +48,24 @@ exports.register = async (req, res) => {
       {
         id: user._id,
         role: user.role,
-        sessionVersion
+        sessionVersion,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: "1d" }
     );
 
     // **Set JWT as HttpOnly cookie**
-    res.cookie('token', token, {
+    res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'None',
+      sameSite: "None",
 
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
     // Respond with complete user profile (never send password or token)
     res.status(200).json({
-      message: 'Login successful',
+      message: "Login successful",
       user: {
         id: user._id,
         _id: user._id,
@@ -75,8 +78,8 @@ exports.register = async (req, res) => {
         phone: user.phone || "",
         location: user.location || "",
         department: user.department || "",
-        joinDate: user.createdAt
-      }
+        joinDate: user.createdAt,
+      },
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -84,15 +87,14 @@ exports.register = async (req, res) => {
 };
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie('token', {
+    res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
 
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ message: "Logout successful" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
