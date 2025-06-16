@@ -1,34 +1,60 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const multer = require("multer");
-const path = require("path");
 
-// Configure multer for avatar upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/avatars/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, "avatar-" + uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// Helper function to generate random avatar using UI-Avatars service
+const generateRandomAvatar = (seed) => {
+  try {
+    // Use the user's name if available, otherwise use email
+    const name = seed.includes("@") ? seed.split("@")[0] : seed;
 
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"));
-    }
-  },
-});
+    // Generate random colors
+    const colors = [
+      "3B82F6",
+      "8B5CF6",
+      "EF4444",
+      "10B981",
+      "F59E0B",
+      "EC4899",
+      "6366F1",
+      "14B8A6",
+    ];
+    const backgrounds = [
+      "F1F5F9",
+      "F8FAFC",
+      "EDE9FE",
+      "FEF2F2",
+      "ECFDF5",
+      "FFFBEB",
+      "FCE7F3",
+      "EEF2FF",
+    ];
 
-exports.uploadAvatar = upload.single("avatar");
+    const randomColor = colors[Math.abs(hashCode(seed)) % colors.length];
+    const randomBg =
+      backgrounds[Math.abs(hashCode(seed + "bg")) % backgrounds.length];
+
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&size=128&background=${randomBg}&color=${randomColor}&bold=true&format=png`;
+  } catch (error) {
+    console.error("Error generating avatar:", error);
+    // Fallback
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      seed
+    )}&size=128&background=random`;
+  }
+};
+
+// Simple hash function for consistent random generation
+const hashCode = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return hash;
+};
 
 exports.addUser = async (req, res) => {
   try {
@@ -62,7 +88,17 @@ exports.addUser = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ name, email, password: hashed, role });
+
+    // Generate random avatar for new user
+    const avatar = generateRandomAvatar(email);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashed,
+      role,
+      avatar,
+    });
 
     res.status(201).json({ message: `${role} created`, userId: newUser._id });
   } catch (err) {
@@ -72,53 +108,63 @@ exports.addUser = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
   try {
+    console.log("📊 Getting user profile for user:", req.user._id);
     const userId = req.user._id;
 
     // Get user profile data
     const user = await User.findById(userId).select("-password");
+    console.log(
+      "👤 Found user:",
+      user ? { id: user._id, name: user.name, email: user.email } : "Not found"
+    );
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // TODO: Add performance metrics calculation
-    // For now, returning placeholder data
-    const performanceMetrics = {
-      tasksCompleted: 0,
-      totalHoursWorked: 0,
-      averageRating: 0,
-      onTimeDelivery: 0,
-    };
+    // Generate avatar if user doesn't have one
+    let avatar = user.avatar;
+    if (!avatar) {
+      avatar = generateRandomAvatar(user.email);
+      // Update user with generated avatar
+      await User.findByIdAndUpdate(userId, { avatar });
+    }
 
-    // TODO: Add recent activity from actual data
-    const recentActivity = [];
-
-    res.json({
+    const profileResponse = {
       profile: {
         name: user.name,
         email: user.email,
         bio: user.bio || "",
         skills: user.skills || [],
-        avatar: user.avatar || null,
+        avatar: avatar,
         phone: user.phone || "",
         location: user.location || "",
         department: user.department || "",
         joinDate: user.createdAt,
         role: user.role,
       },
-      metrics: performanceMetrics,
-      recentActivity: recentActivity,
-    });
+    };
+
+    console.log(
+      "📤 Sending profile response:",
+      JSON.stringify(profileResponse, null, 2)
+    );
+    res.json(profileResponse);
   } catch (err) {
+    console.error("❌ Error in getUserProfile:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
 exports.updateUserProfile = async (req, res) => {
   try {
+    console.log("📝 Updating user profile for user:", req.user._id);
+    console.log("📝 Request body:", req.body);
+
     const userId = req.user._id;
     const updateData = {};
 
-    // Safely extract allowed fields
+    // Safely extract allowed fields (excluding avatar)
     const allowedFields = [
       "name",
       "email",
@@ -133,19 +179,20 @@ exports.updateUserProfile = async (req, res) => {
       }
     });
 
-    // Handle skills separately (comes as JSON string)
+    // Handle skills separately (can be array or JSON string)
     if (req.body.skills) {
-      try {
-        updateData.skills = JSON.parse(req.body.skills);
-      } catch (err) {
+      if (typeof req.body.skills === "string") {
+        try {
+          updateData.skills = JSON.parse(req.body.skills);
+        } catch (err) {
+          updateData.skills = req.body.skills;
+        }
+      } else {
         updateData.skills = req.body.skills;
       }
     }
 
-    // Handle avatar upload
-    if (req.file) {
-      updateData.avatar = `/uploads/avatars/${req.file.filename}`;
-    }
+    console.log("📝 Update data:", updateData);
 
     // Validate email format if provided
     if (updateData.email && !/\S+@\S+\.\S+/.test(updateData.email)) {
@@ -168,6 +215,8 @@ exports.updateUserProfile = async (req, res) => {
       runValidators: true,
     }).select("-password");
 
+    console.log("✅ User updated successfully:", updatedUser);
+
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -177,6 +226,7 @@ exports.updateUserProfile = async (req, res) => {
       user: updatedUser,
     });
   } catch (err) {
+    console.error("❌ Error in updateUserProfile:", err);
     res.status(500).json({ error: err.message });
   }
 };

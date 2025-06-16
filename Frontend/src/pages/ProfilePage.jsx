@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import axios from "../utils/axios";
-import { FiEdit3, FiSave, FiX, FiUpload, FiUser, FiMail, FiBriefcase, FiAward, FiClock, FiTrendingUp } from "react-icons/fi";
+import { FiEdit3, FiSave, FiX, FiUser, FiMail, FiBriefcase, FiArrowLeft } from "react-icons/fi";
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -18,20 +19,9 @@ export default function ProfilePage() {
     location: "",
     department: "",
     joinDate: "",
-  });
-  const [newSkill, setNewSkill] = useState("");
-  const [performanceMetrics, setPerformanceMetrics] = useState({
-    tasksCompleted: 0,
-    totalHoursWorked: 0,
-    averageRating: 0,
-    onTimeDelivery: 0,
-  });
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [previewImage, setPreviewImage] = useState(null);
-
-  // Initialize profile data from user context
-  useEffect(() => {
+  });  const [newSkill, setNewSkill] = useState("");
+  const [errors, setErrors] = useState({});// Initialize profile data from user context
+  useEffect(() => {    
     if (user) {
       setProfileData({
         name: user.name || "",
@@ -46,24 +36,23 @@ export default function ProfilePage() {
       });
       fetchProfileData();
     }
-  }, [user]);
-
-  const fetchProfileData = async () => {
+  }, [user]);  const fetchProfileData = async () => {
     if (!user?._id) return;
     
     setLoading(true);
     try {
-      const response = await axios.get(`/api/users/profile`, { withCredentials: true });
-      const data = response.data;
-      
-      setProfileData(prev => ({
+      const response = await axios.get(`/api/users/profile`, { 
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });      const data = response.data;        setProfileData(prev => ({
         ...prev,
         ...data.profile,
       }));
-      setPerformanceMetrics(data.metrics || {});
-      setRecentActivity(data.recentActivity || []);
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
+      setErrors({ general: "Failed to load profile data. Please try refreshing the page." });
     } finally {
       setLoading(false);
     }
@@ -84,29 +73,14 @@ export default function ProfilePage() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSave = async () => {
+  };  const handleSave = async () => {
     if (!validateForm()) return;
     
     setSaving(true);
     try {
-      const formData = new FormData();
-      
-      // Append profile data
-      Object.keys(profileData).forEach(key => {
-        if (key === 'skills') {
-          formData.append(key, JSON.stringify(profileData[key]));
-        } else if (key === 'avatar' && profileData[key] instanceof File) {
-          formData.append('avatar', profileData[key]);
-        } else if (key !== 'avatar') {
-          formData.append(key, profileData[key]);
-        }
-      });
-
-      const response = await axios.put('/api/users/profile', formData, {
+      const response = await axios.put('/api/users/profile', profileData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
         withCredentials: true
       });
@@ -118,53 +92,21 @@ export default function ProfilePage() {
       });
 
       setIsEditing(false);
-      setPreviewImage(null);
+      setErrors({});
     } catch (error) {
       console.error("Failed to save profile:", error);
-      setErrors({ general: "Failed to save profile. Please try again." });
+      const errorMessage = error.response?.data?.error || "Failed to save profile. Please try again.";
+      setErrors({ general: errorMessage });
     } finally {
       setSaving(false);
     }
   };
-
   const handleCancel = () => {
-    // Reset to original data
-    setProfileData({
-      name: user.name || "",
-      email: user.email || "",
-      bio: user.bio || "",
-      skills: user.skills || [],
-      avatar: user.avatar || null,
-      phone: user.phone || "",
-      location: user.location || "",
-      department: user.department || "",
-      joinDate: user.joinDate || new Date().toISOString().split('T')[0],
-    });
+    // Reset to fetched profile data instead of user context
+    fetchProfileData();
     setIsEditing(false);
     setErrors({});
-    setPreviewImage(null);
   };
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setErrors({ avatar: "Image size should be less than 5MB" });
-        return;
-      }
-      
-      setProfileData(prev => ({ ...prev, avatar: file }));
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result);
-      reader.readAsDataURL(file);
-      
-      // Clear error
-      setErrors(prev => ({ ...prev, avatar: null }));
-    }
-  };
-
   const addSkill = () => {
     if (newSkill.trim() && !profileData.skills.includes(newSkill.trim())) {
       setProfileData(prev => ({
@@ -178,12 +120,7 @@ export default function ProfilePage() {
   const removeSkill = (skillToRemove) => {
     setProfileData(prev => ({
       ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
-    }));
-  };
-
-  const formatTime = (hours) => {
-    return `${Math.round(hours)}h`;
+      skills: prev.skills.filter(skill => skill !== skillToRemove)    }));
   };
 
   if (loading) {
@@ -195,12 +132,19 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-950 p-6">      <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">Profile</h1>
-          {!isEditing ? (
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              <FiArrowLeft size={20} />
+              Back
+            </button>
+            <h1 className="text-3xl font-bold text-white">Profile</h1>
+          </div>          {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
@@ -239,12 +183,11 @@ export default function ProfilePage() {
         {/* Profile Header Card */}
         <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
           <div className="flex items-start gap-6">
-            {/* Avatar */}
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
-                {previewImage || profileData.avatar ? (
+            {/* Avatar */}            <div className="flex flex-col items-center gap-3">
+              <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden relative">
+                {profileData.avatar ? (
                   <img
-                    src={previewImage || (typeof profileData.avatar === 'string' ? profileData.avatar : '')}
+                    src={profileData.avatar}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -252,27 +195,9 @@ export default function ProfilePage() {
                   <FiUser size={32} className="text-gray-400" />
                 )}
               </div>
-              {isEditing && (
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="avatar-upload"
-                  />
-                  <label
-                    htmlFor="avatar-upload"
-                    className="flex items-center gap-1 px-3 py-1 bg-gray-700 hover:bg-gray-600 text-sm text-white rounded cursor-pointer transition-colors"
-                  >
-                    <FiUpload size={14} />
-                    Upload
-                  </label>
-                  {errors.avatar && (
-                    <p className="text-red-400 text-xs mt-1">{errors.avatar}</p>
-                  )}
-                </div>
-              )}
+              <div className="text-center">
+                <p className="text-xs text-gray-400">Auto-generated Avatar</p>
+              </div>
             </div>
 
             {/* Basic Info */}
@@ -418,66 +343,7 @@ export default function ProfilePage() {
             ))}
             {profileData.skills.length === 0 && (
               <p className="text-gray-400">No skills added yet.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            <FiTrendingUp className="inline mr-2" />
-            Performance Metrics
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <FiAward className="text-green-400" size={20} />
-                <span className="text-sm text-gray-400">Tasks Completed</span>
-              </div>
-              <p className="text-2xl font-bold text-white">{performanceMetrics.tasksCompleted}</p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <FiClock className="text-blue-400" size={20} />
-                <span className="text-sm text-gray-400">Hours Worked</span>
-              </div>
-              <p className="text-2xl font-bold text-white">{formatTime(performanceMetrics.totalHoursWorked)}</p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <FiTrendingUp className="text-yellow-400" size={20} />
-                <span className="text-sm text-gray-400">Avg Rating</span>
-              </div>
-              <p className="text-2xl font-bold text-white">{performanceMetrics.averageRating.toFixed(1)}/5</p>
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <FiAward className="text-purple-400" size={20} />
-                <span className="text-sm text-gray-400">On-Time Delivery</span>
-              </div>
-              <p className="text-2xl font-bold text-white">{performanceMetrics.onTimeDelivery}%</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
-          {recentActivity.length > 0 ? (
-            <div className="space-y-3">
-              {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">{activity.description}</p>
-                    <p className="text-gray-400 text-xs">{new Date(activity.timestamp).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-400">No recent activity to display.</p>
-          )}
+            )}          </div>
         </div>
       </div>
     </div>

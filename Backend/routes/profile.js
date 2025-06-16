@@ -10,7 +10,6 @@ router.get("/profile", authMiddleware, userController.getUserProfile);
 router.put(
   "/profile",
   authMiddleware,
-  userController.uploadAvatar,
   userController.updateUserProfile
 );
 

@@ -6,13 +6,12 @@ const {
   addUser,
   getUserProfile,
   updateUserProfile,
-  uploadAvatar,
 } = require("../controllers/userController");
 
 router.post("/add", auth, role("ceo"), addUser);
 
 // Profile routes
 router.get("/profile", auth, getUserProfile);
-router.put("/profile", auth, uploadAvatar, updateUserProfile);
+router.put("/profile", auth, updateUserProfile);
 
 module.exports = router;

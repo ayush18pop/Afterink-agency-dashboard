@@ -32,8 +32,6 @@ app.use(cookieParser());
 
 app.use(express.json());
 
-// Serve static files (for avatar uploads)
-app.use("/uploads", express.static("uploads"));
 app.get("/api/test", (req, res) => {
   res.send("Route working!");
 });

@@ -60,14 +60,22 @@ exports.register = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
-    // Respond with public user info (never send password or token)
+    // Respond with complete user profile (never send password or token)
     res.status(200).json({
       message: 'Login successful',
       user: {
         id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        bio: user.bio || "",
+        skills: user.skills || [],
+        avatar: user.avatar,
+        phone: user.phone || "",
+        location: user.location || "",
+        department: user.department || "",
+        joinDate: user.createdAt
       }
     });
   } catch (err) {
