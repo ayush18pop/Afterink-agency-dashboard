@@ -10,6 +10,8 @@ export default function AddFreelancerForm() {
   });
   const [message, setMessage] = useState("");
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -17,12 +19,16 @@ export default function AddFreelancerForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!passwordRegex.test(formData.password)) {
+      setMessage("Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 digit, and 1 special character.");
+      return;
+    }
     try {
       await axios.post("/api/auth/register", formData);
       setMessage("Freelancer added successfully.");
       setFormData({ name: "", email: "", password: "", role: "freelancer" });
-    } catch {
-      setMessage("Failed to add freelancer.");
+    } catch (err) {
+      setMessage(err.response?.data?.error || "Failed to add freelancer.");
     }
   };
 

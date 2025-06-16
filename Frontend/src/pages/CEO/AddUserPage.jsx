@@ -11,14 +11,22 @@ export default function AddUserPage() {
   });
   const [message, setMessage] = useState(null);
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!passwordRegex.test(formData.password)) {
+      setMessage(
+        "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 digit, and 1 special character."
+      );
+      setTimeout(() => setMessage(null), 4000);
+      return;
+    }
     try {
-      console.log(formData);
       const res = await axios.post(
         "/api/auth/register",
         formData,
@@ -31,7 +39,7 @@ export default function AddUserPage() {
 
       setTimeout(() => setMessage(null), 4000);
     } catch (err) {
-      setMessage("Failed to create user.");
+      setMessage(err.response?.data?.error || "Failed to create user.");
       setTimeout(() => setMessage(null), 4000);
     }
   };
@@ -45,7 +53,9 @@ export default function AddUserPage() {
         <div className="bg-[#151526] p-10 rounded-2xl shadow-xl w-full max-w-2xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-300">Name</label>
+              <label className="block mb-1 text-sm font-medium text-gray-300">
+                Name
+              </label>
               <input
                 type="text"
                 name="name"
@@ -57,7 +67,9 @@ export default function AddUserPage() {
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-300">Email</label>
+              <label className="block mb-1 text-sm font-medium text-gray-300">
+                Email
+              </label>
               <input
                 type="email"
                 name="email"
@@ -69,7 +81,9 @@ export default function AddUserPage() {
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-300">Password</label>
+              <label className="block mb-1 text-sm font-medium text-gray-300">
+                Password
+              </label>
               <input
                 type="password"
                 name="password"
@@ -81,7 +95,9 @@ export default function AddUserPage() {
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-300">Role</label>
+              <label className="block mb-1 text-sm font-medium text-gray-300">
+                Role
+              </label>
               <select
                 name="role"
                 value={formData.role}
