@@ -1,0 +1,17 @@
+.sidebar-logo-container {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  aspect-ratio: 1/1;
+  display: block;
+}
+.sidebar-collapsed .sidebar-logo-container {
+  margin: 0 auto;
+}

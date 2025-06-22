@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="AfterInk Agency Dashboard - Creative Project Management" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AfterInk" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="%PUBLIC_URL%/logo192.png" />
+  
+  <!-- Safari Pinned Tab -->
+  <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#5bbad5" />
+  
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  
+  <!-- Preconnect to external domains for better performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <title>AfterInk Dashboard</title>
+  
+  <!-- Apple-specific CSS fixes -->
+  <style>
+    /* Fix for iOS Safari viewport issues */
+    @supports (-webkit-touch-callout: none) {
+      .min-h-screen {
+        min-height: -webkit-fill-available;
+      }
+      .h-screen {
+        height: -webkit-fill-available;
+      }
+    }
+    
+    /* Fix for iOS Safari input zoom */
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+      select,
+      textarea,
+      input {
+        font-size: 16px;
+      }
+    }
+    
+    /* Fix for iOS Safari backdrop-filter */
+    @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+      .backdrop-blur-xl {
+        -webkit-backdrop-filter: blur(24px);
+        backdrop-filter: blur(24px);
+      }
+    }
+    
+    /* Fix for iOS Safari gradient rendering */
+    .bg-gradient-to-br {
+      background-image: -webkit-linear-gradient(bottom right, var(--tw-gradient-stops));
+      background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+    }
+    
+    /* Fix for iOS Safari flexbox issues */
+    .flex {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+    }
+    
+    /* Fix for iOS Safari grid issues */
+    .grid {
+      display: -webkit-grid;
+      display: grid;
+    }
+    
+    /* Fix for iOS Safari transform issues */
+    .transform {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    
+    /* Fix for iOS Safari transition issues */
+    .transition-all {
+      -webkit-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+    }
+    
+    /* Fix for iOS Safari overflow issues */
+    .overflow-hidden {
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fix for iOS Safari button tap highlight */
+    button {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    /* Fix for iOS Safari scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.5);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.7);
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+</body>
+
+</html>
