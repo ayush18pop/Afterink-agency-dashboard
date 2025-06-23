@@ -4,7 +4,6 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-<<<<<<< HEAD
     extend: {
       fontFamily: {
         'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
@@ -66,9 +65,6 @@ module.exports = {
         '3xl': '1600px',
       },
     },
-=======
-    extend: {},
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   },
   plugins: [],
 }

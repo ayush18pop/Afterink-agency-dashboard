@@ -3,11 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-<<<<<<< HEAD
-    "@tailwindcss/forms": "^0.5.10",
-    "@tailwindcss/typography": "^0.5.16",
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
     "framer-motion": "^12.17.3",

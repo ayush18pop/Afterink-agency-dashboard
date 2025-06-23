@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -207,177 +206,101 @@ export default function Dashboard() {
         {/* Tab Content */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Team Performance Chart */}
-            <div className="card-premium p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <FiBarChart className="mr-2 text-blue-600" />
-                Team Performance
+            {/* Recent Activity */}
+            <div className="glass-card rounded-3xl p-6 shadow-2xl">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <FiActivity className="mr-3 text-blue-600" />
+                Recent Activity
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analytics.performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="name" stroke="#64748b" />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#ffffff', 
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                  <Bar dataKey="tasks" fill="#667eea" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="completed" fill="#10b981" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {analytics.tasks.slice(0, 5).map((task, index) => (
+                  <div key={index} className="flex items-center space-x-4 p-4 bg-white/50 rounded-xl">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <FiTarget className="text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800">{task.title}</p>
+                      <p className="text-sm text-gray-600">{task.assignedTo}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      task.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                      task.status === 'In Progress' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {task.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Task Status Distribution */}
-            <div className="card-premium p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <FiPieChart className="mr-2 text-purple-600" />
-                Task Status
+            {/* Team Performance */}
+            <div className="glass-card rounded-3xl p-6 shadow-2xl">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <FiTrendingUp className="mr-3 text-green-600" />
+                Team Performance
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart>
-                  <Pie
-                    data={[
-                      { name: 'Completed', value: analytics.tasks.filter(t => t.status === 'Completed').length },
-                      { name: 'In Progress', value: analytics.tasks.filter(t => t.status === 'In Progress').length },
-                      { name: 'Hold', value: analytics.tasks.filter(t => t.status === 'Hold').length },
-                      { name: 'Not Started', value: analytics.tasks.filter(t => t.status === 'Not Started').length }
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {COLORS.map((color, index) => (
-                      <Cell key={`cell-${index}`} fill={color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#ffffff', 
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                </RechartsPieChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {analytics.performanceData.slice(0, 5).map((member, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-white/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold">
+                        {member.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800">{member.name}</p>
+                        <p className="text-sm text-gray-600">{member.tasks} tasks</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-800">{member.efficiency}%</p>
+                      <p className="text-sm text-gray-600">efficiency</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'performance' && (
-          <div className="card-premium p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-              <FiTrendingUp className="mr-2 text-green-600" />
-              Performance Analytics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {analytics.performanceData.map((member, index) => (
-                <div key={index} className="bg-gradient-to-br from-white/50 to-white/30 rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-gray-800">{member.name}</h4>
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                      {member.efficiency}%
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tasks:</span>
-                      <span className="font-semibold text-gray-800">{member.tasks}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Hours:</span>
-                      <span className="font-semibold text-gray-800">{member.hours}h</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Completed:</span>
-                      <span className="font-semibold text-green-600">{member.completed}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          <div className="glass-card rounded-3xl p-6 shadow-2xl">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Performance Analytics</h3>
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.performanceData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="tasks" fill="#667eea" />
+                  <Bar dataKey="completed" fill="#764ba2" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         )}
 
         {activeTab === 'analytics' && (
-          <div className="card-premium p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-              <FiAward className="mr-2 text-yellow-600" />
-              Detailed Analytics
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div>
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">Weekly Trends</h4>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={analytics.weeklyStats}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="name" stroke="#64748b" />
-                    <YAxis stroke="#64748b" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#ffffff', 
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                    <Line type="monotone" dataKey="value" stroke="#667eea" strokeWidth={3} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">Team Overview</h4>
-                <div className="space-y-4">
-                  {analytics.members.slice(0, 5).map((member, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-white/20">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                          {member.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-800">{member.name}</p>
-                          <p className="text-sm text-gray-500">{member.role}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-800">Active</p>
-                        <p className="text-xs text-green-600">Online</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div className="glass-card rounded-3xl p-6 shadow-2xl">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Weekly Trends</h3>
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analytics.weeklyStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="tasks" stroke="#667eea" strokeWidth={2} />
+                  <Line type="monotone" dataKey="hours" stroke="#764ba2" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         )}
       </div>
-=======
-import Sidebar from "../../components/Sidebar";
-import TaskOverviewCards from "./TaskOverviewCards";
-import MemberOverviewCards from "./MemberOverviewCards";
-
-export default function Dashboard() {
-  return (
-    <div className="flex h-screen bg-[#17171e]">
-      {/* Sidebar: fixed width, vertical layout */}
-      {/* <aside className="w-64 flex-shrink-0 h-full overflow-y-auto">
-        <Sidebar />
-      </aside> */}
-
-      {/* Main content: flexible area, scrollable */}
-      <main className="flex-1 overflow-y-auto px-10 py-8 space-y-12">
-        <TaskOverviewCards />
-        <MemberOverviewCards />
-      </main>
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     </div>
   );
 }

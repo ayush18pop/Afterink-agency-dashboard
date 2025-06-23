@@ -13,7 +13,6 @@ const taskSchema = new mongoose.Schema({
       required: true
     }
   ],
-<<<<<<< HEAD
   assignedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -28,8 +27,6 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   // ✅ CEO-controlled overall task progress
   status: {
     type: String,

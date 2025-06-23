@@ -206,7 +206,6 @@ exports.updateUserProfile = async (req, res) => {
         _id: { $ne: userId },
       });
       if (existingUser) {
-<<<<<<< HEAD
         return res.status(400).json({ error: "Email already taken" });
       }
     }
@@ -216,24 +215,11 @@ exports.updateUserProfile = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     ).select("-password");
-=======
-        return res.status(400).json({ error: "Email already exists" });
-      }
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
-    console.log("✅ User updated successfully:", updatedUser);
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
-<<<<<<< HEAD
     console.log("✅ User profile updated successfully");
     res.json({
       message: "Profile updated successfully",
@@ -248,18 +234,12 @@ exports.updateUserProfile = async (req, res) => {
         department: updatedUser.department,
         role: updatedUser.role,
       },
-=======
-    res.json({
-      message: "Profile updated successfully",
-      user: updatedUser,
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     });
   } catch (err) {
     console.error("❌ Error in updateUserProfile:", err);
     res.status(500).json({ error: err.message });
   }
 };
-<<<<<<< HEAD
 
 // Add missing analytics functions
 exports.getUserAnalytics = async (req, res) => {
@@ -356,5 +336,3 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ error: "Failed to get users" });
   }
 };
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d

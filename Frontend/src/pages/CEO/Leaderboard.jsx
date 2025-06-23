@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../utils/axios";
-import Sidebar from "../../components/Sidebar";
 import { motion } from "framer-motion";
-<<<<<<< HEAD
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { FiAward, FiTrendingUp, FiUsers, FiTarget, FiClock, FiStar, FiBarChart, FiArrowUp, FiArrowDown } from 'react-icons/fi';
+import { FiAward, FiTrendingUp, FiUsers, FiTarget, FiClock, FiStar, FiBarChart, FiArrowUp, FiArrowDown, FiCheck } from 'react-icons/fi';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function LeaderboardPage() {
@@ -91,7 +89,7 @@ export default function LeaderboardPage() {
     );
   }
 
-          return (
+  return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
@@ -198,233 +196,83 @@ export default function LeaderboardPage() {
         )}
 
         {/* Full Leaderboard */}
-        <div className="card-premium p-8 shadow-2xl slide-up">
+        <div className="card-premium p-6 shadow-2xl slide-up">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
             <FiUsers className="mr-2 text-blue-600" />
             Complete Leaderboard
           </h2>
-          
           <div className="space-y-4">
             {leaderboardData.map((member, index) => (
-              <div 
-                key={member._id} 
-                className="flex items-center justify-between p-6 bg-gradient-to-r from-white/50 to-white/30 rounded-2xl border border-white/20 hover-lift"
-                style={{ animationDelay: `${index * 0.1}s` }}
+              <motion.div
+                key={member._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:shadow-lg transition-all duration-300"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${getRankColor(index + 1)} rounded-full flex items-center justify-center text-white font-bold shadow-lg`}>
-                      {getRankIcon(index + 1)}
-                    </div>
-                    <div>
-                      <span className="text-2xl font-bold text-gray-400">#{index + 1}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {member.name?.charAt(0).toUpperCase()}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-12 h-12 bg-gradient-to-r ${getRankColor(index + 1)} rounded-full flex items-center justify-center text-white font-bold shadow-lg`}>
+                        {index + 1}
+                      </div>
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                        {member.name?.charAt(0).toUpperCase()}
+                      </div>
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800">{member.name}</h3>
-                      <p className="text-sm text-gray-600">{member.role?.replace('_', ' ')}</p>
+                      <p className="text-gray-600 text-sm">{member.role}</p>
+                      <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
+                        <span className="flex items-center space-x-1">
+                          <FiTarget className="text-blue-500" />
+                          <span>{member.totalTasks} tasks</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <FiCheck className="text-green-500" />
+                          <span>{member.completedTasks} completed</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <FiTrendingUp className="text-purple-500" />
+                          <span>{member.efficiency}% efficiency</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center space-x-6">
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Tasks</p>
-                    <p className="text-lg font-bold text-gray-800">{member.totalTasks}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Completed</p>
-                    <p className="text-lg font-bold text-green-600">{member.completedTasks}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Efficiency</p>
-                    <p className="text-lg font-bold text-blue-600">{member.efficiency}%</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Score</p>
-                    <p className="text-2xl font-bold gradient-text">{member.score}</p>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-gray-800">{member.score}</div>
+                    <p className="text-gray-600 text-sm">Total Score</p>
+                    {index < 3 && (
+                      <div className="mt-2">
+                        {getRankIcon(index + 1)}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Performance Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Efficiency Chart */}
-          <div className="card-premium p-6 shadow-2xl slide-up">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <FiTrendingUp className="mr-2 text-green-600" />
-              Team Efficiency
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={leaderboardData.slice(0, 8)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                  }}
-                />
-                <Bar dataKey="efficiency" fill="#10b981" radius={[4, 4, 0, 0]} />
+        {/* Performance Chart */}
+        <div className="card-premium p-6 shadow-2xl slide-up">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <FiBarChart className="mr-2 text-blue-600" />
+            Performance Overview
+          </h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={leaderboardData.slice(0, 10)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="score" fill="#667eea" />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Task Completion Distribution */}
-          <div className="card-premium p-6 shadow-2xl slide-up">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <FiTarget className="mr-2 text-blue-600" />
-              Task Distribution
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Completed', value: leaderboardData.reduce((sum, m) => sum + m.completedTasks, 0) },
-                    { name: 'In Progress', value: leaderboardData.reduce((sum, m) => sum + m.inProgressTasks, 0) },
-                    { name: 'Pending', value: leaderboardData.reduce((sum, m) => sum + (m.totalTasks - m.completedTasks - m.inProgressTasks), 0) }
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {COLORS.map((color, index) => (
-                    <Cell key={`cell-${index}`} fill={color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                  }}
-                />
-              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
-=======
-
-export default function LeaderboardPage() {
-  const [daily, setDaily] = useState([]);
-  const [weekly, setWeekly] = useState([]);
-  const [monthly, setMonthly] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      axios.get("/api/dashboard/leaderboard/daily"),
-      axios.get("/api/dashboard/leaderboard/weekly"),
-      axios.get("/api/dashboard/leaderboard/monthly"),
-    ])
-      .then(([dRes, wRes, mRes]) => {
-        setDaily(dRes.data.leaderboard || []);
-        setWeekly(wRes.data.leaderboard || []);
-        setMonthly(mRes.data.leaderboard || []);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  const renderList = (entries) => {
-    const maxSec = entries[0]?.seconds || 1;
-    return (
-      <ul className="divide-y divide-[#343454]">
-        {entries.map((user, idx) => {
-          const perc = Math.floor((user.seconds / maxSec) * 100);
-          return (
-            <motion.li
-              key={user.email}
-              className="flex items-center justify-between py-3"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.05 }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-gray-400 w-6 text-center">{idx + 1}</span>
-                <div className="w-8 h-8 bg-[#2a2a3a] rounded-full flex items-center justify-center text-gray-200 font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div className="font-medium text-gray-100">{user.name}</div>
-                  <div className="text-xs text-gray-500 capitalize">{user.role.replace("_", " ")}</div>
-                </div>
-              </div>
-              <div className="flex-1 mx-4 h-3 bg-[#20202d] rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-blue-600"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${perc}%` }}
-                  transition={{ duration: 0.8 }}
-                />
-              </div>
-              <span className="text-gray-200 text-sm font-medium">
-                {user.formatted || user.totalTime}
-              </span>
-            </motion.li>
-          );
-        })}
-      </ul>
-    );
-  };
-
-  const sections = [
-    { title: "Daily Top", data: daily },
-    { title: "Weekly Top", data: weekly },
-    { title: "Monthly Top", data: monthly },
-  ];
-
-  return (
-    <div className="flex h-screen bg-[#17171e]">
-      {/* Sidebar */}
-      {/* <aside className="w-64 flex-shrink-0 h-full overflow-y-auto">
-        <Sidebar />
-      </aside> */}
-
-      {/* Main */}
-      <main className="flex-1 overflow-y-auto px-10 py-8 space-y-8">
-        <h2 className="text-3xl font-bold text-gray-100 mb-4">Leaderboards</h2>
-        {loading ? (
-          <div className="text-gray-400">Loading leaderboards...</div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
-            {sections.map((sec) => (
-              <div
-                key={sec.title}
-                className="bg-[#222233] rounded-2xl shadow-lg p-6 flex flex-col"
-              >
-                <h3 className="text-xl font-semibold text-gray-100 mb-4">
-                  {sec.title}
-                </h3>
-                {sec.data.length > 0 ? (
-                  renderList(sec.data)
-                ) : sec.title === "Daily Top" ? (
-                  <div className="text-gray-400 italic">No one has started work today.</div>
-                ) : (
-                  <div className="text-gray-400 italic">No data available.</div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     </div>
   );
 }

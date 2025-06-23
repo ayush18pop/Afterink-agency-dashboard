@@ -1,6 +1,7 @@
 const TimeLog = require('../models/TimeLog');
 const User = require('../models/User');
 const Task = require('../models/Task');
+
 // Helper for formatting
 function formatDuration(totalSeconds) {
   const hours = Math.floor(totalSeconds / 3600);
@@ -15,6 +16,7 @@ function formatDuration(totalSeconds) {
     formatted: parts.join(', ')
   };
 }
+
 exports.getDailyLeaderboard = async (req, res) => {
   try {
     const todayStart = new Date();
@@ -50,11 +52,7 @@ exports.getTodayAnalytics = async (req, res) => {
     const users = await User.find({ role: { $in: ['freelancer', 'founding_member'] } })
       .select('_id name email role');
 
-<<<<<<< HEAD
     // Set today's range (midnight to now)
-=======
-    // Set today’s range (midnight to now)
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     const now = new Date();
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
@@ -103,11 +101,7 @@ exports.getTodayAnalytics = async (req, res) => {
         const actualStart = log.startTime >= todayStart ? log.startTime : todayStart;
         duration = Math.floor((log.endTime - new Date(actualStart)) / 1000);
       } else if (log.status === 'In Progress' && log.startTime <= now) {
-<<<<<<< HEAD
         // In progress: from today's midnight or startTime (whichever is later) to now
-=======
-        // In progress: from today’s midnight or startTime (whichever is later) to now
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
         const sessionStart = log.startTime >= todayStart ? log.startTime : todayStart;
         duration = Math.floor((now - new Date(sessionStart)) / 1000);
       }
@@ -130,6 +124,7 @@ exports.getTodayAnalytics = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.getRawUserTaskTotals = async (req, res) => {
   try {
     // Include role in select!
@@ -198,7 +193,6 @@ exports.startTask = async (req, res) => {
     const userId = req.user._id;
     const { taskId } = req.body;
 
-<<<<<<< HEAD
     // Validate task exists and user is assigned
     const task = await Task.findById(taskId);
     if (!task) {
@@ -234,220 +228,95 @@ exports.startTask = async (req, res) => {
     }
 
     // Create new time log entry
-=======
-    // Find the most recent "In Progress" task for this user
-    const currentInProgressLog = await TimeLog.findOne({ user: userId, status: 'In Progress' }).sort({ startTime: -1 });
-
-    if (currentInProgressLog) {
-      // Move the current task to 'Hold' before starting a new task
-      currentInProgressLog.status = 'Hold';
-      currentInProgressLog.endTime = new Date();
-      currentInProgressLog.duration = (currentInProgressLog.endTime - currentInProgressLog.startTime) / 1000;
-      await currentInProgressLog.save();
-    }
-
-    // Create a new log for the task that's starting
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     const newLog = new TimeLog({
       user: userId,
       task: taskId,
-      status: 'In Progress',
       startTime: new Date(),
+      status: 'In Progress'
     });
 
     await newLog.save();
 
-<<<<<<< HEAD
-    // Update task status to 'In Progress' if it's 'Not Started'
-    if (task.status === 'Not Started') {
-      task.status = 'In Progress';
-      await task.save();
-    }
-
     res.status(200).json({ 
-      message: "Task started successfully", 
-      log: newLog,
-      taskStatus: task.status
+      message: "Task started successfully",
+      logId: newLog._id 
     });
-=======
-    res.status(200).json({ message: "Task started successfully", log: newLog });
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   } catch (error) {
-    console.error('Error starting task:', error);
-    res.status(500).json({ error: "Error starting task" });
+    console.error("Start task error:", error);
+    res.status(500).json({ error: "Failed to start task" });
   }
 };
 
 // @route POST /api/time/hold
-// @desc Pause current task
+// @desc Pause working on a task
 exports.holdTask = async (req, res) => {
   try {
     const userId = req.user._id;
-<<<<<<< HEAD
     const { taskId } = req.body;
 
-    // Find the active log for this task and user
-    const log = await TimeLog.findOne({ 
-      user: userId, 
-      task: taskId, 
-      status: 'In Progress' 
-    }).sort({ startTime: -1 });
+    // Find the active log for this user and task
+    const activeLog = await TimeLog.findOne({
+      user: userId,
+      task: taskId,
+      status: 'In Progress'
+    });
 
-    if (!log) {
+    if (!activeLog) {
       return res.status(404).json({ error: "No active task found" });
     }
 
-    // Update log to hold status
-    log.status = 'Hold';
-    log.endTime = new Date();
-    log.duration = Math.floor((log.endTime - log.startTime) / 1000);
-    await log.save();
+    // Update the log
+    activeLog.status = 'Hold';
+    activeLog.endTime = new Date();
+    activeLog.duration = Math.floor((activeLog.endTime - activeLog.startTime) / 1000);
 
-    // Update task status to 'Hold' if all assigned users are on hold
-    const task = await Task.findById(taskId);
-    if (task) {
-      const allUserLogs = await TimeLog.find({ 
-        task: taskId, 
-        status: { $in: ['In Progress', 'Hold'] } 
-      }).sort({ startTime: -1 });
-
-      const allUsersOnHold = task.assignedTo.every(userId => {
-        const userLog = allUserLogs.find(log => log.user.toString() === userId.toString());
-        return userLog && userLog.status === 'Hold';
-      });
-
-      if (allUsersOnHold) {
-        task.status = 'Hold';
-        await task.save();
-      }
-    }
+    await activeLog.save();
 
     res.status(200).json({ 
-      message: "Task put on hold", 
-      log,
-      taskStatus: task?.status
+      message: "Task paused successfully",
+      duration: activeLog.duration
     });
-=======
-
-    // Find the most recent task that is in progress for this user
-    const log = await TimeLog.findOne({ user: userId, status: 'In Progress' }).sort({ startTime: -1 });
-
-    if (!log) return res.status(404).json({ error: "No active task" });
-
-    // Update the status to "Hold"
-    log.status = 'Hold';
-    log.endTime = new Date();
-
-    // Calculate the time spent in progress and update the duration
-    log.duration = (log.endTime - new Date(log.startTime)) / 1000; // in seconds
-    await log.save();
-
-    // Respond with the updated log
-    res.status(200).json({ message: "Task put on hold", log });
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   } catch (error) {
-    console.error("Error putting task on hold:", error);
-    res.status(500).json({ error: "Error putting task on hold" });
+    console.error("Hold task error:", error);
+    res.status(500).json({ error: "Failed to pause task" });
   }
 };
 
-<<<<<<< HEAD
-=======
-
-// Helper: Format duration in seconds to HH:MM:SS
-function formatDuration(seconds) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return `${h}:${m}:${s}`;
-}
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
-// Backend code for completing a task
-// Backend code to complete task
+// @route POST /api/time/complete
+// @desc Complete working on a task
 exports.completeTask = async (req, res) => {
   try {
     const userId = req.user._id;
     const { taskId } = req.body;
 
-<<<<<<< HEAD
-    // Find the most recent log for this task and user
-    const log = await TimeLog.findOne({ 
-      user: userId, 
-      task: taskId 
-    }).sort({ startTime: -1 });
+    // Find the active log for this user and task
+    const activeLog = await TimeLog.findOne({
+      user: userId,
+      task: taskId,
+      status: 'In Progress'
+    });
 
-    if (!log) {
-      return res.status(404).json({ error: "No task log found" });
+    if (!activeLog) {
+      return res.status(404).json({ error: "No active task found" });
     }
 
-    // If task is currently in progress, pause it first
-    if (log.status === 'In Progress') {
-      log.status = 'Hold';
-      log.endTime = new Date();
-      log.duration = Math.floor((log.endTime - log.startTime) / 1000);
-    }
+    // Update the log
+    activeLog.status = 'Completed';
+    activeLog.endTime = new Date();
+    activeLog.duration = Math.floor((activeLog.endTime - activeLog.startTime) / 1000);
 
-    // Mark as completed
-    log.status = 'Completed';
-    if (!log.endTime) {
-      log.endTime = new Date();
-      log.duration = Math.floor((log.endTime - log.startTime) / 1000);
-    }
-    await log.save();
-
-    // Update task status to 'Completed' if all assigned users have completed
-    const task = await Task.findById(taskId);
-    if (task) {
-      const allUserLogs = await TimeLog.find({ 
-        task: taskId 
-      }).sort({ startTime: -1 });
-
-      const allUsersCompleted = task.assignedTo.every(userId => {
-        const userLog = allUserLogs.find(log => log.user.toString() === userId.toString());
-        return userLog && userLog.status === 'Completed';
-      });
-
-      if (allUsersCompleted) {
-        task.status = 'Completed';
-        await task.save();
-      }
-    }
+    await activeLog.save();
 
     res.status(200).json({ 
-      message: "Task completed", 
-      log,
-      taskStatus: task?.status
+      message: "Task completed successfully",
+      duration: activeLog.duration
     });
-=======
-    // Find the most recent log entry for the task and user
-    const log = await TimeLog.findOne({ user: userId, task: taskId, status: 'Hold' }).sort({ startTime: -1 });
-
-    if (!log) {
-      return res.status(404).json({ error: "Task must be on hold before completion" });
-    }
-
-    // Update the task's log to mark it as completed
-    log.status = 'Completed';
-    log.endTime = new Date();
-    log.duration = (log.endTime - log.startTime) / 1000;
-    await log.save();
-
-    // Optional: Update task status here if you also want to mark the task itself as completed.
-    const task = await Task.findById(taskId);
-    if (task) {
-      task.status = 'Completed';
-      await task.save();
-    }
-
-    res.status(200).json({ message: "Task completed", log });
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   } catch (error) {
-    console.error('Error completing task:', error);
-    res.status(500).json({ error: "Error completing task" });
+    console.error("Complete task error:", error);
+    res.status(500).json({ error: "Failed to complete task" });
   }
 };
 
-<<<<<<< HEAD
 // @route GET /api/time/task/:taskId/accumulated
 // @desc Get accumulated time for a specific task
 exports.getTaskAccumulatedTime = async (req, res) => {
@@ -456,100 +325,93 @@ exports.getTaskAccumulatedTime = async (req, res) => {
     const userId = req.user._id;
 
     const logs = await TimeLog.find({
-      task: taskId,
       user: userId,
-      duration: { $gt: 0 }
+      task: taskId,
+      status: { $in: ['Hold', 'Completed'] }
     });
 
-    const totalTime = logs.reduce((sum, log) => sum + log.duration, 0);
-    const formattedTime = formatDuration(totalTime);
+    const totalSeconds = logs.reduce((sum, log) => sum + (log.duration || 0), 0);
 
     res.json({
       taskId,
-      totalSeconds: totalTime,
-      formatted: formattedTime.formatted
+      totalSeconds,
+      formatted: formatDuration(totalSeconds).formatted,
+      sessions: logs.length
     });
   } catch (error) {
-    console.error("Error getting accumulated time:", error);
-    res.status(500).json({ error: "Failed to get accumulated time" });
+    console.error("Get task accumulated time error:", error);
+    res.status(500).json({ error: "Failed to get task time" });
   }
 };
 
-// Add missing analytics function
-exports.getUserTimeAnalytics = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    
-    // Get user's time logs
-    const logs = await TimeLog.find({ user: userId });
-    
-    // Calculate time analytics
-    const totalTime = logs.reduce((sum, log) => sum + (log.duration || 0), 0);
-    
-    // Calculate daily averages
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayLogs = logs.filter(log => new Date(log.startTime) >= today);
-    const todayTime = todayLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
-    
-    // Calculate weekly data
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - 7);
-    const weeklyLogs = logs.filter(log => new Date(log.startTime) >= weekStart);
-    const weeklyTime = weeklyLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
-    
-    // Calculate monthly data
-    const monthStart = new Date();
-    monthStart.setDate(monthStart.getDate() - 30);
-    const monthlyLogs = logs.filter(log => new Date(log.startTime) >= monthStart);
-    const monthlyTime = monthlyLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
-    
-    const analytics = {
-      totalTime,
-      todayTime,
-      weeklyTime,
-      monthlyTime,
-      averageTimePerDay: totalTime > 0 ? Math.round(totalTime / 30) : 0,
-      averageTimePerWeek: weeklyTime > 0 ? Math.round(weeklyTime / 7) : 0,
-      averageTimePerMonth: monthlyTime > 0 ? Math.round(monthlyTime / 30) : 0,
-      totalSessions: logs.length,
-      averageSessionLength: logs.length > 0 ? Math.round(totalTime / logs.length) : 0
-    };
-
-    res.json(analytics);
-  } catch (error) {
-    console.error("Error getting user time analytics:", error);
-    res.status(500).json({ error: "Failed to get user time analytics" });
-  }
-};
-
-// Get detailed time logs for a specific task
+// @route GET /api/time/task/:taskId/logs
+// @desc Get all time logs for a specific task
 exports.getTaskTimeLogs = async (req, res) => {
   try {
     const { taskId } = req.params;
     const userId = req.user._id;
 
     const logs = await TimeLog.find({
-      task: taskId,
-      user: userId
+      user: userId,
+      task: taskId
     }).sort({ startTime: -1 });
 
-    const totalTime = logs.reduce((sum, log) => sum + (log.duration || 0), 0);
-    const formattedTime = formatDuration(totalTime);
+    const formattedLogs = logs.map(log => ({
+      ...log.toObject(),
+      formattedDuration: log.duration ? formatDuration(log.duration).formatted : '0 seconds'
+    }));
 
-    res.json({
-      taskId,
-      logs,
-      totalSeconds: totalTime,
-      formatted: formattedTime.formatted
-    });
+    res.json({ logs: formattedLogs });
   } catch (error) {
-    console.error("Error getting task time logs:", error);
-    res.status(500).json({ error: "Failed to get task time logs" });
+    console.error("Get task logs error:", error);
+    res.status(500).json({ error: "Failed to get task logs" });
   }
 };
 
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
+// @route GET /api/time/user-analytics
+// @desc Get user's time analytics
+exports.getUserTimeAnalytics = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    const logs = await TimeLog.find({ user: userId });
+    const tasks = await Task.find({ assignedTo: userId });
 
+    // Calculate analytics
+    const totalTime = logs.reduce((sum, log) => sum + (log.duration || 0), 0);
+    const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+    const totalTasks = tasks.length;
+
+    // Calculate weekly data
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 7);
+    const weeklyLogs = logs.filter(log => new Date(log.startTime) >= weekStart);
+    const weeklyTime = weeklyLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
+
+    // Calculate daily data
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayLogs = logs.filter(log => new Date(log.startTime) >= today);
+    const todayTime = todayLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
+
+    const analytics = {
+      totalTime,
+      weeklyTime,
+      todayTime,
+      totalTasks,
+      completedTasks,
+      efficiency: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      averageTimePerTask: totalTasks > 0 ? Math.round(totalTime / totalTasks) : 0,
+      formatted: {
+        totalTime: formatDuration(totalTime).formatted,
+        weeklyTime: formatDuration(weeklyTime).formatted,
+        todayTime: formatDuration(todayTime).formatted
+      }
+    };
+
+    res.json(analytics);
+  } catch (error) {
+    console.error("Get user time analytics error:", error);
+    res.status(500).json({ error: "Failed to get user analytics" });
+  }
+}; 

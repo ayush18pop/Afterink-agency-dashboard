@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-<<<<<<< HEAD
 
 /* Base styles */
 html, body {
@@ -354,8 +353,4 @@ body {
 /* Smooth transitions for theme changes */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-=======
-body {
-  @apply bg-gray-900;
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 }

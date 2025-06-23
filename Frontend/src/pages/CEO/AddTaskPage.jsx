@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -22,9 +21,9 @@ export default function AddTaskPage() {
   });
   const [errors, setErrors] = useState({});
 
- useEffect(() => {
+  useEffect(() => {
     fetchUsers();
-}, []);
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -109,54 +108,10 @@ export default function AddTaskPage() {
       case 'Medium': return 'text-yellow-600 bg-yellow-100';
       case 'Low': return 'text-green-600 bg-green-100';
       default: return 'text-gray-600 bg-gray-100';
-=======
-import React, { useState, useEffect } from "react";
-import Sidebar from "../../components/Sidebar";
-import axios from "../../utils/axios";
-
-export default function AddTaskPage() {
-  const [members, setMembers] = useState([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [assignedTo, setAssignedTo] = useState([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  // Fetch all freelancers & founding members
- useEffect(() => {
-  axios
-    .get("/api/tasks/all-names", { withCredentials: true }) // Add this option
-    .then(res => setMembers(res.data.members || []))
-    .catch(() => setMembers([]));
-}, []);
-
-  const toggleMember = id => {
-    setAssignedTo(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setError(""); setSuccess("");
-    try {
-      await axios.post("/api/tasks/create", {
-        title,
-        description,
-        assignedTo
-      });
-      setSuccess("Task created successfully!");
-      setTitle("");
-      setDescription("");
-      setAssignedTo([]);
-    } catch (err) {
-      setError(err.response?.data?.error || err.message);
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     }
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header Section */}
@@ -205,75 +160,62 @@ export default function AddTaskPage() {
               <label className="block text-sm font-semibold text-gray-700">
                 Task Title *
               </label>
-            <input
+              <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`input-premium w-full ${errors.title ? 'border-red-300 focus:border-red-500 focus:ring-red-500/50' : ''}`}
+                className={`input-premium w-full ${errors.title ? 'border-red-300 focus:border-red-500' : ''}`}
                 placeholder="Enter task title"
               />
               {errors.title && (
-                <p className="text-red-600 text-sm flex items-center">
-                  <FiAlertCircle className="mr-1" />
-                  {errors.title}
-                </p>
+                <p className="text-red-600 text-sm">{errors.title}</p>
               )}
-          </div>
+            </div>
 
             {/* Task Description */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
                 Description *
               </label>
-            <textarea
+              <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className={`input-premium w-full resize-none ${errors.description ? 'border-red-300 focus:border-red-500 focus:ring-red-500/50' : ''}`}
-                placeholder="Describe the task in detail..."
+                className={`input-premium w-full ${errors.description ? 'border-red-300 focus:border-red-500' : ''}`}
+                placeholder="Describe the task in detail"
               />
               {errors.description && (
-                <p className="text-red-600 text-sm flex items-center">
-                  <FiAlertCircle className="mr-1" />
-                  {errors.description}
-                </p>
+                <p className="text-red-600 text-sm">{errors.description}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Assign To */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Assign To *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <FiUser className="text-gray-400" />
-                  </div>
-                  <select
-                    name="assignedTo"
-                    value={formData.assignedTo}
-                    onChange={handleChange}
-                    className={`input-premium w-full pl-12 ${errors.assignedTo ? 'border-red-300 focus:border-red-500 focus:ring-red-500/50' : ''}`}
-                  >
-                    <option value="">Select team member</option>
-                    {users.map((user) => (
-                      <option key={user._id} value={user._id}>
-                        {user.name} ({user.role.replace('_', ' ')})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {errors.assignedTo && (
-                  <p className="text-red-600 text-sm flex items-center">
-                    <FiAlertCircle className="mr-1" />
-                    {errors.assignedTo}
-                  </p>
-                )}
-          </div>
+            {/* Assigned To */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Assign To *
+              </label>
+              <select
+                name="assignedTo"
+                value={formData.assignedTo}
+                onChange={handleChange}
+                className={`input-premium w-full ${errors.assignedTo ? 'border-red-300 focus:border-red-500' : ''}`}
+              >
+                <option value="">Select team member</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name} ({user.role})
+                  </option>
+                ))}
+              </select>
+              {errors.assignedTo && (
+                <p className="text-red-600 text-sm">{errors.assignedTo}</p>
+              )}
+            </div>
 
+            {/* Priority and Due Date Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Priority */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
@@ -290,88 +232,35 @@ export default function AddTaskPage() {
                   <option value="High">High</option>
                 </select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Due Date */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Due Date *
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <FiCalendar className="text-gray-400" />
-                  </div>
-                  <input
-                    type="date"
-                    name="dueDate"
-                    value={formData.dueDate}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split('T')[0]}
-                    className={`input-premium w-full pl-12 ${errors.dueDate ? 'border-red-300 focus:border-red-500 focus:ring-red-500/50' : ''}`}
-                  />
-                </div>
+                <input
+                  type="date"
+                  name="dueDate"
+                  value={formData.dueDate}
+                  onChange={handleChange}
+                  className={`input-premium w-full ${errors.dueDate ? 'border-red-300 focus:border-red-500' : ''}`}
+                />
                 {errors.dueDate && (
-                  <p className="text-red-600 text-sm flex items-center">
-                    <FiAlertCircle className="mr-1" />
-                    {errors.dueDate}
-                  </p>
+                  <p className="text-red-600 text-sm">{errors.dueDate}</p>
                 )}
               </div>
-
-              {/* Status */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Initial Status
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="input-premium w-full"
-                >
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Hold">On Hold</option>
-                </select>
-              </div>
             </div>
 
-            {/* Priority Preview */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <FiAlertCircle className="mr-2 text-blue-600" />
-                Priority Preview
-              </h3>
-              <div className="flex items-center space-x-2">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(formData.priority)}`}>
-                  {formData.priority} Priority
-                </span>
-                <span className="text-sm text-gray-600">
-                  {formData.priority === 'High' && 'Urgent - Requires immediate attention'}
-                  {formData.priority === 'Medium' && 'Important - Should be completed soon'}
-                  {formData.priority === 'Low' && 'Normal - Can be completed when convenient'}
-                </span>
-            </div>
-          </div>
-
-            {/* Submit Buttons */}
-            <div className="flex justify-end space-x-4 pt-6">
+            {/* Submit Button */}
+            <div className="flex justify-end pt-6">
               <button
-                type="button"
-                onClick={() => navigate('/ceo/tasks')}
-                className="btn-premium-secondary"
-              >
-                Cancel
-              </button>
-          <button
-            type="submit"
+                type="submit"
                 disabled={loading}
-                className="btn-premium flex items-center space-x-2"
+                className="btn-premium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
-                    <div className="loading-premium w-4 h-4"></div>
+                    <FiLoader className="animate-spin" />
                     <span>Creating Task...</span>
                   </>
                 ) : (
@@ -380,112 +269,11 @@ export default function AddTaskPage() {
                     <span>Create Task</span>
                   </>
                 )}
-          </button>
+              </button>
             </div>
-        </form>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card-premium p-6 text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <FiUsers className="text-blue-600 text-xl" />
-            </div>
-            <p className="text-2xl font-bold text-gray-800">{users.length}</p>
-            <p className="text-gray-600 text-sm">Available Team Members</p>
-          </div>
-
-          <div className="card-premium p-6 text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <FiTarget className="text-green-600 text-xl" />
-            </div>
-            <p className="text-2xl font-bold text-gray-800">Active</p>
-            <p className="text-gray-600 text-sm">Task Management</p>
-          </div>
-
-          <div className="card-premium p-6 text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <FiClock className="text-purple-600 text-xl" />
-            </div>
-            <p className="text-2xl font-bold text-gray-800">Real-time</p>
-            <p className="text-gray-600 text-sm">Progress Tracking</p>
-          </div>
+          </form>
         </div>
       </div>
-=======
-    <div className="flex h-screen bg-[#17171e]">
-      {/* <aside className="w-64 flex-shrink-0 h-full overflow-y-auto">
-        <Sidebar />
-      </aside> */}
-      <main className="flex-1 overflow-y-auto p-8">
-        <h2 className="text-2xl font-bold text-gray-100 mb-6">Add New Task</h2>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-[#222233] p-6 rounded-2xl shadow-lg"
-        >
-          {error && (
-            <div className="text-red-400 bg-red-900/20 p-2 rounded">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="text-green-400 bg-green-900/20 p-2 rounded">
-              {success}
-            </div>
-          )}
-
-          <div>
-            <label className="block text-gray-200 mb-1">Title</label>
-            <input
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-              className="w-full bg-[#1f1f2d] border border-[#343454] px-3 py-2 rounded-lg text-gray-100 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-200 mb-1">Description</label>
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              rows={3}
-              className="w-full bg-[#1f1f2d] border border-[#343454] px-3 py-2 rounded-lg text-gray-100 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <span className="block text-gray-200 mb-1">Assign To</span>
-            <div className="max-h-40 overflow-y-auto bg-[#1f1f2d] border border-[#343454] rounded-lg p-2">
-              {members.map(m => (
-                <label
-                  key={m._id}
-                  className="flex items-center gap-2 mb-2 text-gray-200"
-                >
-                  <input
-                    type="checkbox"
-                    checked={assignedTo.includes(m._id)}
-                    onChange={() => toggleMember(m._id)}
-                    className="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-0"
-                  />
-                  {m.name} <span className="text-xs text-gray-400">({m.role})</span>
-                </label>
-              ))}
-              {members.length === 0 && (
-                <div className="text-gray-400 text-sm">No members available</div>
-              )}
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
-          >
-            Create Task
-          </button>
-        </form>
-      </main>
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     </div>
   );
 }

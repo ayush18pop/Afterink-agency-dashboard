@@ -33,8 +33,23 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.get("/api/test", (req, res) => {
-  res.send("Route working!");
+  res.json({ 
+    message: "Backend is working!", 
+    timestamp: new Date().toISOString(),
+    cors: "enabled",
+    cookies: req.cookies ? Object.keys(req.cookies) : "no cookies"
+  });
 });
+
+// Add a simple health check route
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "healthy",
+    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 // app.use("/api/users", profileRoutes);
@@ -42,7 +57,6 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/time", timeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-<<<<<<< HEAD
 // Start server even if MongoDB fails
 const startServer = () => {
   app.listen(5000, () => {
@@ -73,15 +87,3 @@ if (process.env.MONGO_URI) {
   console.log("No MongoDB URI provided, starting server without database...");
   startServer();
 }
-=======
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(5000, () => console.log("Server running on port 5000"));
-  })
-  .catch((err) => console.error(err));
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d

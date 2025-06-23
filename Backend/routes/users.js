@@ -6,29 +6,22 @@ const {
   addUser,
   getUserProfile,
   updateUserProfile,
-<<<<<<< HEAD
   getUserAnalytics,
   getUserPerformance,
   getAllUsers,
   getUsers,
   updateProfile,
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 } = require("../controllers/userController");
 
 router.post("/add", auth, role("ceo"), addUser);
 
-<<<<<<< HEAD
 // Get all users (CEO only)
 router.get("/", auth, role("ceo"), getAllUsers);
 
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 // Profile routes
 router.get("/profile", auth, getUserProfile);
 router.put("/profile", auth, updateUserProfile);
 
-<<<<<<< HEAD
 // Analytics routes
 router.get("/analytics", auth, getUserAnalytics);
 router.get("/performance", auth, getUserPerformance);
@@ -78,6 +71,4 @@ router.get('/top-performers', auth, role(['ceo']), async (req, res) => {
   }
 });
 
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 module.exports = router;

@@ -14,7 +14,6 @@ const instance = axios.create({
   },
 });
 
-<<<<<<< HEAD
 // Add request interceptor for debugging
 instance.interceptors.request.use(
   (config) => {
@@ -52,6 +51,4 @@ instance.interceptors.response.use(
   }
 );
 
-=======
->>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 export default instance;
