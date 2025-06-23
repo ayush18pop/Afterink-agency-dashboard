@@ -266,6 +266,7 @@ module.exports = {
 
 const getTopPerformer = async (req, res) => {
   try {
+<<<<<<< HEAD
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -387,10 +388,57 @@ const getWeeklyAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Weekly analytics error:", error);
     res.status(500).json({ error: "Failed to get weekly analytics" });
+=======
+    const logs = await TimeLog.find({
+      status: { $in: ["Hold", "Completed", "In Progress"] }
+    }).populate("user");
+
+    const userTimeMap = {};
+
+    for (const log of logs) {
+      const user = log.user;
+      if (!user) continue;
+
+      const uid = user._id.toString();
+
+      if (!userTimeMap[uid]) {
+        userTimeMap[uid] = {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          seconds: 0
+        };
+      }
+
+      let duration = log.duration || 0;
+
+      if (log.status === "In Progress" && log.startTime && !log.endTime) {
+        duration += Math.floor((Date.now() - new Date(log.startTime)) / 1000);
+      }
+
+      userTimeMap[uid].seconds += duration;
+    }
+
+    const sorted = Object.values(userTimeMap)
+      .sort((a, b) => b.seconds - a.seconds)
+      .map(user => ({
+        ...user,
+        formatted: formatDuration(user.seconds)
+      }));
+
+    res.json({ topPerformer: sorted[0] || null });
+  } catch (error) {
+    console.error("Top Performer Error:", error);
+    res.status(500).json({
+      error: "Failed to determine top performer",
+      message: error.message
+    });
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   }
 };
 
 module.exports = {
+<<<<<<< HEAD
   getDailyLeaderboard,
   getWeeklyLeaderboard,
   getMonthlyLeaderboard,
@@ -398,4 +446,11 @@ module.exports = {
   getTaskWiseUserOverview,
   getTodayAnalytics,
   getWeeklyAnalytics,
+=======
+  getTaskWiseUserOverview,
+  getDailyLeaderboard,
+  getWeeklyLeaderboard,
+  getMonthlyLeaderboard,
+  getTopPerformer
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 };

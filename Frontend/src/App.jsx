@@ -1,7 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+<<<<<<< HEAD
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -20,8 +23,11 @@ import MyTasks from "./pages/Founding/MyTasks";
 import FreelancerAnalysis from "./pages/Founding/FreelancerAnalysis";
 import AddFreelancerForm from "./pages/Founding/AddFreelancerForm";
 import FoundingProfile from "./pages/Founding/FoundingProfile";
+<<<<<<< HEAD
 import { runAllTests } from "./test-utils";
 
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 // Route guards
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -41,6 +47,7 @@ function FoundingOnlyRoute({ children }) {
   return user?.role === "founding_member" ? children : <Navigate to="/login" replace />;
 }
 
+<<<<<<< HEAD
 function ThemeToggleButton() {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -105,5 +112,44 @@ export default function App() {
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
+=======
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Route */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Profile Route - Accessible to all authenticated users */}
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+
+          {/* CEO Routes */}
+          <Route path="/ceo" element={<CEOOnlyRoute><CEOLayout /></CEOOnlyRoute>}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="add-task" element={<AddTaskPage />} />
+            <Route path="add-user" element={<AddUserPage />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="top" element={<TopPerfomancePage />} />
+            <Route path="tasks" element={<CEOTasks />} />
+            <Route path="profile" element={<CEOProfile />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
+
+          {/* Founding Member Routes */}
+          <Route path="/founding" element={<FoundingOnlyRoute><FoundingLayout /></FoundingOnlyRoute>}>
+            <Route path="tasks" element={<MyTasks />} />
+            <Route path="analysis" element={<FreelancerAnalysis />} />
+            <Route path="add-user" element={<AddFreelancerForm />} />
+            <Route path="profile" element={<FoundingProfile />} />
+            <Route index element={<Navigate to="tasks" replace />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   );
 }

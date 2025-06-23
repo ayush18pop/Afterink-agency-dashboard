@@ -6,6 +6,7 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+<<<<<<< HEAD
     // Password validation: 6+ chars for demo, 8+ with complexity for production
     const isProduction = process.env.NODE_ENV === 'production';
     let passwordValid = true;
@@ -27,6 +28,16 @@ exports.register = async (req, res) => {
 
     if (!passwordValid) {
       return res.status(400).json({ error: passwordError });
+=======
+    // Password validation: 8+ chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        error:
+          "Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.",
+      });
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     }
 
     const userExists = await User.findOne({ email });
@@ -70,8 +81,14 @@ exports.login = async (req, res) => {
     // **Set JWT as HttpOnly cookie**
     res.cookie("token", token, {
       httpOnly: true,
+<<<<<<< HEAD
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax",
+=======
+      secure: true,
+      sameSite: "None",
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 

@@ -10,11 +10,16 @@ const {
   getTaskNames,
   getAnalysisForTask,
   getAnalysisForUser,
+<<<<<<< HEAD
   getMyselfCEOTasks,
   getUserTaskAnalytics,
   getUserTimeAnalytics
 } = require('../controllers/taskController');
 const Task = require('../models/Task');
+=======
+  getMyselfCEOTasks
+} = require('../controllers/taskController');
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 
 // CEO can create tasks
 router.post('/create', auth, role(['ceo']), createTask);
@@ -30,6 +35,7 @@ router.get('/analytics/task/:taskId', auth, role(['ceo']), getAnalysisForTask);
 router.get('/analytics/user/:userId', auth, role(['ceo']), getAnalysisForUser);
 router.get('/analytics/task/:taskId/today',auth, role(['ceo']), getAnalysisForUser);
 
+<<<<<<< HEAD
 // User analytics endpoints
 router.get('/user-analytics', auth, getUserTaskAnalytics);
 
@@ -57,4 +63,8 @@ router.get('/analytics', auth, role(['ceo']), async (req, res) => {
   }
 });
 
+=======
+router.get('/myselfceotasks', auth, role(['ceo']), getMyselfCEOTasks);  // CEO-specific tasks
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 module.exports = router;

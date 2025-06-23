@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+<<<<<<< HEAD
 import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/axios";
@@ -48,11 +49,23 @@ export default function ProfilePage() {
       todayTime: 0
     }
   });
+=======
+import { useNavigate } from "react-router-dom";
+import axios from "../utils/axios";
+import { FiEdit3, FiSave, FiX, FiUser, FiMail, FiBriefcase, FiArrowLeft } from "react-icons/fi";
+
+export default function ProfilePage() {
+  const { user, updateUser } = useAuth();
+  const navigate = useNavigate();  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   const [profileData, setProfileData] = useState({
     name: "",
     email: "",
     bio: "",
     skills: [],
+<<<<<<< HEAD
     phone: "",
     location: "",
     department: ""
@@ -90,11 +103,53 @@ export default function ProfilePage() {
       setProfileData(response.data.user);
     } catch (error) {
       console.error("Failed to fetch profile:", error);
+=======
+    avatar: null,
+    phone: "",
+    location: "",
+    department: "",
+    joinDate: "",
+  });  const [newSkill, setNewSkill] = useState("");
+  const [errors, setErrors] = useState({});// Initialize profile data from user context
+  useEffect(() => {    
+    if (user) {
+      setProfileData({
+        name: user.name || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        skills: user.skills || [],
+        avatar: user.avatar || null,
+        phone: user.phone || "",
+        location: user.location || "",
+        department: user.department || "",
+        joinDate: user.joinDate || new Date().toISOString().split('T')[0],
+      });
+      fetchProfileData();
+    }
+  }, [user]);  const fetchProfileData = async () => {
+    if (!user?._id) return;
+    
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/users/profile`, { 
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });      const data = response.data;        setProfileData(prev => ({
+        ...prev,
+        ...data.profile,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch profile data:", error);
+      setErrors({ general: "Failed to load profile data. Please try refreshing the page." });
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     } finally {
       setLoading(false);
     }
   };
 
+<<<<<<< HEAD
   const fetchAnalytics = async () => {
     try {
       const [taskRes, timeRes, performanceRes] = await Promise.all([
@@ -192,6 +247,8 @@ export default function ProfilePage() {
     setLongestStreak(maxStreak);
   };
 
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   const validateForm = () => {
     const newErrors = {};
     
@@ -207,9 +264,13 @@ export default function ProfilePage() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+<<<<<<< HEAD
   };
 
   const handleSave = async () => {
+=======
+  };  const handleSave = async () => {
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     if (!validateForm()) return;
     
     setSaving(true);
@@ -221,6 +282,10 @@ export default function ProfilePage() {
         withCredentials: true
       });
 
+<<<<<<< HEAD
+=======
+      // Update user context with new data
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
       updateUser({
         ...user,
         ...response.data.user
@@ -236,13 +301,21 @@ export default function ProfilePage() {
       setSaving(false);
     }
   };
+<<<<<<< HEAD
 
   const handleCancel = () => {
+=======
+  const handleCancel = () => {
+    // Reset to fetched profile data instead of user context
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     fetchProfileData();
     setIsEditing(false);
     setErrors({});
   };
+<<<<<<< HEAD
 
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   const addSkill = () => {
     if (newSkill.trim() && !profileData.skills.includes(newSkill.trim())) {
       setProfileData(prev => ({
@@ -256,6 +329,7 @@ export default function ProfilePage() {
   const removeSkill = (skillToRemove) => {
     setProfileData(prev => ({
       ...prev,
+<<<<<<< HEAD
       skills: prev.skills.filter(skill => skill !== skillToRemove)
     }));
   };
@@ -356,20 +430,29 @@ export default function ProfilePage() {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     return `${h}h ${m}m`;
+=======
+      skills: prev.skills.filter(skill => skill !== skillToRemove)    }));
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   };
 
   if (loading) {
     return (
+<<<<<<< HEAD
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading-premium mx-auto mb-4"></div>
           <p className="text-premium-secondary text-xl">Loading profile...</p>
         </div>
+=======
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-white text-lg">Loading profile...</div>
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
       </div>
     );
   }
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -695,6 +778,220 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+=======
+    <div className="min-h-screen bg-gray-950 p-6">      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              <FiArrowLeft size={20} />
+              Back
+            </button>
+            <h1 className="text-3xl font-bold text-white">Profile</h1>
+          </div>          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              <FiEdit3 size={16} />
+              Edit Profile
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800 text-white rounded-lg transition-colors"
+              >
+                <FiSave size={16} />
+                {saving ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+              >
+                <FiX size={16} />
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Error Message */}
+        {errors.general && (
+          <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+            {errors.general}
+          </div>
+        )}
+
+        {/* Profile Header Card */}
+        <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
+          <div className="flex items-start gap-6">
+            {/* Avatar */}            <div className="flex flex-col items-center gap-3">
+              <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden relative">
+                {profileData.avatar ? (
+                  <img
+                    src={profileData.avatar}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <FiUser size={32} className="text-gray-400" />
+                )}
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-400">Auto-generated Avatar</p>
+              </div>
+            </div>
+
+            {/* Basic Info */}
+            <div className="flex-1 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    <FiUser className="inline mr-1" size={14} />
+                    Name
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.name}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-white text-lg font-semibold">{profileData.name}</p>
+                  )}
+                  {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    <FiMail className="inline mr-1" size={14} />
+                    Email
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      value={profileData.email}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-gray-300">{profileData.email}</p>
+                  )}
+                  {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Phone</label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={profileData.phone}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-gray-300">{profileData.phone || "Not provided"}</p>
+                  )}
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Location</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profileData.location}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    />
+                  ) : (
+                    <p className="text-gray-300">{profileData.location || "Not provided"}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Role and Department */}
+              <div className="flex items-center gap-4">
+                <span className="px-3 py-1 bg-blue-600 text-white text-sm rounded-full capitalize">
+                  <FiBriefcase className="inline mr-1" size={12} />
+                  {user?.role?.replace('_', ' ')}
+                </span>
+                {profileData.department && (
+                  <span className="text-gray-400 text-sm">{profileData.department}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bio Section */}
+        <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Bio</h2>
+          {isEditing ? (
+            <textarea
+              value={profileData.bio}
+              onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+              placeholder="Tell us about yourself..."
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 h-24 resize-none"
+            />
+          ) : (
+            <p className="text-gray-300">
+              {profileData.bio || "No bio provided yet."}
+            </p>
+          )}
+        </div>
+
+        {/* Skills Section */}
+        <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Skills</h2>
+          {isEditing && (
+            <div className="mb-4 flex gap-2">
+              <input
+                type="text"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                placeholder="Add a skill..."
+                className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              />
+              <button
+                onClick={addSkill}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Add
+              </button>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {profileData.skills.map((skill, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-gray-700 text-gray-200 text-sm rounded-full flex items-center gap-2"
+              >
+                {skill}
+                {isEditing && (
+                  <button
+                    onClick={() => removeSkill(skill)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <FiX size={14} />
+                  </button>
+                )}
+              </span>
+            ))}
+            {profileData.skills.length === 0 && (
+              <p className="text-gray-400">No skills added yet.</p>
+            )}          </div>
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
         </div>
       </div>
     </div>

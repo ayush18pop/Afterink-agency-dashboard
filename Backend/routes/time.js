@@ -10,10 +10,14 @@ const {
   getUserTimeTable,
   getRawUserTaskTotals,
   getTodayAnalytics,
+<<<<<<< HEAD
   getDailyLeaderboard,
   getTaskAccumulatedTime,
   getTaskTimeLogs,
   getUserTimeAnalytics
+=======
+  getDailyLeaderboard
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 } = require('../controllers/timeController');
 
 
@@ -22,13 +26,17 @@ router.post('/start', auth, role(['freelancer', 'founding_member','ceo']), start
 router.post('/hold', auth, role(['freelancer', 'founding_member','ceo']), holdTask);
 router.post('/complete', auth, role(['freelancer', 'founding_member','ceo']), completeTask);
 router.get('/todaytime', auth, role(['freelancer', 'founding_member','ceo']), getDailyLeaderboard);
+<<<<<<< HEAD
 router.get('/task/:taskId/accumulated', auth, role(['freelancer', 'founding_member','ceo']), getTaskAccumulatedTime);
 router.get('/task/:taskId/logs', auth, role(['freelancer', 'founding_member','ceo']), getTaskTimeLogs);
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 // CEO can view analytics for any range/all users
 //router.get('/analytics/time-table', auth, role(['ceo']), getUserTimeTable);
 router.get('/analytics/raw', auth, role(['ceo']), getRawUserTaskTotals);
 router.get('/analytics/today', auth, role(['ceo']), getTodayAnalytics);
 
+<<<<<<< HEAD
 // User time analytics
 router.get('/user-analytics', auth, getUserTimeAnalytics);
 
@@ -53,4 +61,6 @@ router.get('/analytics', auth, role(['ceo']), async (req, res) => {
   }
 });
 
+=======
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 module.exports = router;

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -469,3 +470,15 @@ export default function TopPerfomancePage() {
     </div>
   );
 }
+=======
+import TopPerformerCard from "./TopPerformerCard";
+
+function TopPerfomancePage() {
+  return (
+    <div className="p-6">
+      <TopPerformerCard />
+    </div>
+  );
+}
+export default TopPerfomancePage;
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d

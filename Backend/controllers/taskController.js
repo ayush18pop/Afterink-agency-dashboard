@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 const User = require("../models/User");
 
 const mongoose = require("mongoose");
@@ -93,6 +97,13 @@ exports.getAnalysisForUser = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 function formatDuration(totalSeconds) {
   const hours   = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -205,9 +216,17 @@ exports.getAnalysisForTask = async (req, res) => {
     res.json({ data: Object.values(result) });
   } catch (err) {
     res.status(500).json({ error: "Error in ALAL for task", message: err.message });
+<<<<<<< HEAD
   }
 }
 
+=======
+
+  }
+}
+
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 function formatDurations(seconds) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -217,6 +236,7 @@ function formatDurations(seconds) {
 
 exports.createTask = async (req, res) => {
   try {
+<<<<<<< HEAD
     console.log("🔧 Create Task Request:", {
       user: req.user._id,
       userRole: req.user.role,
@@ -281,11 +301,33 @@ exports.createTask = async (req, res) => {
         TimeLog.create({
           task: task._id,
           user: userId,
+=======
+    if (req.user.role !== 'ceo') {
+      return res.status(403).json({ error: 'Only CEO can create tasks' });
+    }
+
+    const { title, description, assignedTo } = req.body;
+
+    const users = await User.find({ _id: { $in: assignedTo } });
+    if (users.length !== assignedTo.length) {
+      return res.status(400).json({ error: 'One or more users not found' });
+    }
+
+    const task = await Task.create({ title, description, assignedTo });
+
+    // 👇 FIX field names: use `task` and `user`, not `taskId` and `userId`
+    const logs = await Promise.all(
+      assignedTo.map(user =>
+        TimeLog.create({
+          task: task._id,
+          user,
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
           status: 'Not Started',
         })
       )
     );
 
+<<<<<<< HEAD
     console.log("⏰ Time Logs Created:", logs.length);
 
     task.logs = logs.map(log => log._id);
@@ -300,10 +342,22 @@ exports.createTask = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ Create Task Error:", err);
+=======
+    task.logs = logs.map(log => log._id);
+    await task.save();
+
+    res.status(201).json({ message: 'Task created successfully', taskId: task._id });
+  } catch (err) {
+    console.error("Create Task Error:", err);
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
     res.status(500).json({ error: err.message });
   }
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
 exports.updateTaskStatus = async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -351,6 +405,7 @@ exports.getTasks = async (req, res) => {
 
 exports.getMyselfCEOTasks = async (req, res) => {
   try {
+<<<<<<< HEAD
     const userId = req.user._id;
     const tasks = await Task.find({ assignedTo: userId })
       .populate('assignedTo', 'name email')
@@ -427,5 +482,19 @@ exports.getUserTimeAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Error getting user time analytics:", error);
     res.status(500).json({ error: "Failed to get user time analytics" });
+=======
+    let tasks;
+    console.log("Fetching tasks for CEO:", req.user._id);
+    tasks = await Task.find({ assignedTo: req.user._id })
+        .populate({
+          path: 'logs',
+          match: { user: req.user._id }, // Use `user` instead of `userId`
+        });
+    // Return the tasks assigned to the CEO
+     res.status(200).json(tasks);
+  } catch (error) {
+    console.error("Error fetching CEO tasks:", error);
+    return res.status(500).json({ message: "Error fetching CEO tasks", error });
+>>>>>>> f31bdbdb7522a6bab74947b24d753e28c25a804d
   }
 };
