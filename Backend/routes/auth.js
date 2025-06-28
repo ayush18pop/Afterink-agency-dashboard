@@ -9,6 +9,7 @@ router.post(
   "/register",
   authMiddleware,
   roleMiddleware(["ceo", "founding_member"]),
+
   authController.register
 );
 
