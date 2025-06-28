@@ -14,41 +14,43 @@ const instance = axios.create({
   },
 });
 
-// Add request interceptor for debugging
-instance.interceptors.request.use(
-  (config) => {
-    console.log("🚀 Request:", {
-      method: config.method,
-      url: config.url,
-      data: config.data,
-      withCredentials: config.withCredentials
-    });
-    return config;
-  },
-  (error) => {
-    console.error("❌ Request Error:", error);
-    return Promise.reject(error);
-  }
-);
+// Add request interceptor for debugging (development only)
+if (process.env.NODE_ENV === "development") {
+  instance.interceptors.request.use(
+    (config) => {
+      console.log("🚀 Request:", {
+        method: config.method,
+        url: config.url,
+        data: config.data,
+        withCredentials: config.withCredentials
+      });
+      return config;
+    },
+    (error) => {
+      console.error("❌ Request Error:", error);
+      return Promise.reject(error);
+    }
+  );
 
-// Add response interceptor for debugging
-instance.interceptors.response.use(
-  (response) => {
-    console.log("✅ Response:", {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    });
-    return response;
-  },
-  (error) => {
-    console.error("❌ Response Error:", {
-      status: error.response?.status,
-      url: error.config?.url,
-      data: error.response?.data
-    });
-    return Promise.reject(error);
-  }
-);
+  // Add response interceptor for debugging (development only)
+  instance.interceptors.response.use(
+    (response) => {
+      console.log("✅ Response:", {
+        status: response.status,
+        url: response.config.url,
+        data: response.data
+      });
+      return response;
+    },
+    (error) => {
+      console.error("❌ Response Error:", {
+        status: error.response?.status,
+        url: error.config?.url,
+        data: error.response?.data
+      });
+      return Promise.reject(error);
+    }
+  );
+}
 
 export default instance;

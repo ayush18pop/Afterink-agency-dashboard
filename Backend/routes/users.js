@@ -66,7 +66,9 @@ router.get('/top-performers', auth, role(['ceo']), async (req, res) => {
 
     res.json({ performers: sortedPerformers });
   } catch (error) {
-    console.error('Error getting top performers:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error getting top performers:', error);
+    }
     res.status(500).json({ error: 'Failed to get top performers' });
   }
 });

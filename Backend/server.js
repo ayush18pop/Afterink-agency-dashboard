@@ -57,11 +57,27 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/time", timeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Start server even if MongoDB fails
+// 404 handler
+app.use("*", (req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error("Server error:", err);
+  }
+  res.status(500).json({ error: "Internal server error" });
+});
+
+// Start server function
 const startServer = () => {
-  app.listen(5000, () => {
-    console.log("Server running on port 5000");
-    console.log("MongoDB connection status:", mongoose.connection.readyState === 1 ? "Connected" : "Disconnected");
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Server running on port ${port}`);
+      console.log("MongoDB connection status:", mongoose.connection.readyState === 1 ? "Connected" : "Disconnected");
+    }
   });
 };
 
@@ -75,15 +91,21 @@ if (process.env.MONGO_URI) {
       socketTimeoutMS: 45000,
     })
     .then(() => {
-      console.log("MongoDB connected successfully");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("MongoDB connected successfully");
+      }
       startServer();
     })
     .catch((err) => {
-      console.error("MongoDB connection failed:", err.message);
-      console.log("Starting server without MongoDB...");
+      if (process.env.NODE_ENV === 'development') {
+        console.error("MongoDB connection failed:", err.message);
+        console.log("Starting server without MongoDB...");
+      }
       startServer();
     });
 } else {
-  console.log("No MongoDB URI provided, starting server without database...");
+  if (process.env.NODE_ENV === 'development') {
+    console.log("No MongoDB URI provided, starting server without database...");
+  }
   startServer();
 }

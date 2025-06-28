@@ -6,6 +6,23 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    // Validate role
+    const validRoles = ["ceo", "founding_member", "freelancer"];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: "Invalid role" });
+    }
+
     // Password validation: 6+ chars for demo, 8+ with complexity for production
     const isProduction = process.env.NODE_ENV === 'production';
     let passwordValid = true;
@@ -30,15 +47,19 @@ exports.register = async (req, res) => {
     }
 
     const userExists = await User.findOne({ email });
-    if (userExists)
+    if (userExists) {
       return res.status(400).json({ error: "User already exists" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed, role });
 
     res.status(201).json({ message: `${role} registered successfully` });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Registration error:", err);
+    }
+    res.status(500).json({ error: "Registration failed" });
   }
 };
 
@@ -46,18 +67,27 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: "Invalid credentials" });
+    if (!match) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-    // 🔐 Generate a new session version (timestamp)
+    // Generate a new session version (timestamp)
     const sessionVersion = new Date().toISOString();
     user.sessionVersion = sessionVersion;
     await user.save();
 
-    // 🪪 Include sessionVersion in JWT payload
+    // Include sessionVersion in JWT payload
     const token = jwt.sign(
       {
         id: user._id,
@@ -68,7 +98,7 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // **Set JWT as HttpOnly cookie**
+    // Set JWT as HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -95,7 +125,10 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Login error:", err);
+    }
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
@@ -104,11 +137,14 @@ exports.logout = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     });
 
     res.status(200).json({ message: "Logout successful" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Logout error:", err);
+    }
+    res.status(500).json({ error: "Logout failed" });
   }
 };

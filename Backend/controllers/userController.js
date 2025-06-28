@@ -37,7 +37,9 @@ const generateRandomAvatar = (seed) => {
       name
     )}&size=128&background=${randomBg}&color=${randomColor}&bold=true&format=png`;
   } catch (error) {
-    console.error("Error generating avatar:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error generating avatar:", error);
+    }
     // Fallback
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(
       seed
@@ -60,6 +62,17 @@ exports.addUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     const currentUser = req.user; // Comes from auth middleware
+
+    // Validate required fields
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
 
     // Validate if user already exists
     const exists = await User.findOne({ email });
@@ -102,21 +115,19 @@ exports.addUser = async (req, res) => {
 
     res.status(201).json({ message: `${role} created`, userId: newUser._id });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Add user error:", err);
+    }
+    res.status(500).json({ error: "Failed to create user" });
   }
 };
 
 exports.getUserProfile = async (req, res) => {
   try {
-    console.log("📊 Getting user profile for user:", req.user._id);
     const userId = req.user._id;
 
     // Get user profile data
     const user = await User.findById(userId).select("-password");
-    console.log(
-      "👤 Found user:",
-      user ? { id: user._id, name: user.name, email: user.email } : "Not found"
-    );
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -145,22 +156,17 @@ exports.getUserProfile = async (req, res) => {
       },
     };
 
-    console.log(
-      "📤 Sending profile response:",
-      JSON.stringify(profileResponse, null, 2)
-    );
     res.json(profileResponse);
   } catch (err) {
-    console.error("❌ Error in getUserProfile:", err);
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Get user profile error:", err);
+    }
+    res.status(500).json({ error: "Failed to get user profile" });
   }
 };
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    console.log("📝 Updating user profile for user:", req.user._id);
-    console.log("📝 Request body:", req.body);
-
     const userId = req.user._id;
     const updateData = {};
 
@@ -192,8 +198,6 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
-    console.log("📝 Update data:", updateData);
-
     // Validate email format if provided
     if (updateData.email && !/\S+@\S+\.\S+/.test(updateData.email)) {
       return res.status(400).json({ error: "Invalid email format" });
@@ -220,7 +224,6 @@ exports.updateUserProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    console.log("✅ User profile updated successfully");
     res.json({
       message: "Profile updated successfully",
       user: {
@@ -236,8 +239,10 @@ exports.updateUserProfile = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error in updateUserProfile:", err);
-    res.status(500).json({ error: err.message });
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Update user profile error:", err);
+    }
+    res.status(500).json({ error: "Failed to update profile" });
   }
 };
 
@@ -276,7 +281,9 @@ exports.getUserAnalytics = async (req, res) => {
 
     res.json(analytics);
   } catch (error) {
-    console.error("Error getting user analytics:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error getting user analytics:", error);
+    }
     res.status(500).json({ error: "Failed to get user analytics" });
   }
 };
@@ -314,7 +321,9 @@ exports.getUserPerformance = async (req, res) => {
 
     res.json(performance);
   } catch (error) {
-    console.error("Error getting user performance:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error getting user performance:", error);
+    }
     res.status(500).json({ error: "Failed to get user performance" });
   }
 };
@@ -332,7 +341,9 @@ exports.getAllUsers = async (req, res) => {
 
     res.json(usersWithStatus);
   } catch (error) {
-    console.error("Error getting all users:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error getting all users:", error);
+    }
     res.status(500).json({ error: "Failed to get users" });
   }
 };
